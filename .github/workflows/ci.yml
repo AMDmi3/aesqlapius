@@ -14,6 +14,6 @@ jobs:
           pip install -r requirements-dev.txt
           pip install codecov
       - name: Run unit tests
-        run: pytest --cov-report=xml --cov=aesqlapius tests/
+        run: pytest -v -rs --cov-report=xml --cov=aesqlapius tests/
       - name: Push coverage info
         run: codecov
