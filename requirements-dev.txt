@@ -1,0 +1,6 @@
+flake8
+mypy
+psycopg2
+pytest
+pytest-cov
+pytest-datadir
