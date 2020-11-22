@@ -2,6 +2,8 @@ name: CI
 on: [ push, pull_request ]
 jobs:
   build:
+    env:
+      POSTGRESQL_DSN: dbname=aesqlapius_test user=aesqlapius_test password=aesqlapius_test
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -13,6 +15,12 @@ jobs:
         run: |
           pip install -r requirements-dev.txt
           pip install codecov
+      - name: Prepare PostgreSQL database
+        run: |
+          sudo service postgresql start
+          sudo -u postgres psql -c "CREATE DATABASE aesqlapius_test"
+          sudo -u postgres psql -c "CREATE USER aesqlapius_test WITH PASSWORD 'aesqlapius_test'"
+          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE aesqlapius_test TO aesqlapius_test"
       - name: Run unit tests
         run: pytest -v -rs --cov-report=xml --cov=aesqlapius tests/
       - name: Push coverage info
