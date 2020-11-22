@@ -1,0 +1,97 @@
+import pytest
+
+from aesqlapius.function_def import parse_function_definition
+from aesqlapius.args import prepare_args_as_dict, prepare_args_as_list
+
+
+@pytest.fixture
+def func_def():
+    func_code = """def foo(a: str,
+                b: int,
+                c: str="c",
+                d: int=4,
+                e: str="e",
+                f: int=6) -> None: ...
+    """
+
+    return parse_function_definition(func_code)
+
+
+def test_dict_as_dict(func_def):
+    assert prepare_args_as_dict(
+        func_def,
+        [
+            'a',
+            2,
+            'cc',
+            44
+        ],
+        {}
+    ) == {
+        'a': 'a',
+        'b': 2,
+        'c': 'cc',
+        'd': 44,
+        'e': 'e',
+        'f': 6
+    }
+
+
+def test_list_as_dict(func_def):
+    assert prepare_args_as_dict(
+        func_def,
+        [],
+        {
+            'a': 'a',
+            'b': 2,
+            'c': 'cc',
+            'd': 44
+        }
+    ) == {
+        'a': 'a',
+        'b': 2,
+        'c': 'cc',
+        'd': 44,
+        'e': 'e',
+        'f': 6
+    }
+
+
+def test_dict_as_list(func_def):
+    assert prepare_args_as_list(
+        func_def,
+        [
+            'a',
+            2,
+            'cc',
+            44
+        ],
+        {}
+    ) == [
+        'a',
+        2,
+        'cc',
+        44,
+        'e',
+        6
+    ]
+
+
+def test_list_as_list(func_def):
+    assert prepare_args_as_list(
+        func_def,
+        [],
+        {
+            'a': 'a',
+            'b': 2,
+            'c': 'cc',
+            'd': 44
+        }
+    ) == [
+        'a',
+        2,
+        'cc',
+        44,
+        'e',
+        6
+    ]
