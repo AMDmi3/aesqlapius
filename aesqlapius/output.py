@@ -1,9 +1,10 @@
+import inspect
 from typing import Any, Callable, Dict, List, Tuple, Union
 
 from aesqlapius.function_def import ReturnValueInnerFormat
 
 def generate_row_processor(inner_format: Union[ReturnValueInnerFormat, str], field_names: List[str], stack_depth: int = 2) -> Callable[[Tuple[Any]], Any]:
-    if inner_format is not ReturnValueInnerFormat:
+    if not isinstance(inner_format, ReturnValueInnerFormat):
         def process_row(row: Tuple[Any]) -> Dict[str, Any]:
             # get the frame of method caller; usually,
             # [0] is process_row
@@ -19,9 +20,9 @@ def generate_row_processor(inner_format: Union[ReturnValueInnerFormat, str], fie
             else:
                 raise NameError(f"name '{inner_format}' is not defined")
 
-            return custom_format(*dict(zip(field_names, row)))
+            return custom_format(**dict(zip(field_names, row)))
 
-    if inner_format == ReturnValueInnerFormat.TUPLE:
+    elif inner_format == ReturnValueInnerFormat.TUPLE:
         def process_row(row: Tuple[Any]) -> Tuple[Any]:
             return row
 
