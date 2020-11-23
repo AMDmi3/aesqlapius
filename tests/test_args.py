@@ -1,7 +1,7 @@
 import pytest
 
-from aesqlapius.function_def import parse_function_definition
 from aesqlapius.args import prepare_args_as_dict, prepare_args_as_list
+from aesqlapius.function_def import parse_function_definition
 
 
 @pytest.fixture

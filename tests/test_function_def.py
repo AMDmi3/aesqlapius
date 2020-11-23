@@ -1,6 +1,13 @@
 import pytest
 
-from aesqlapius.function_def import *
+from aesqlapius.function_def import (
+    ArgumentDefinition,
+    FunctionDefinition,
+    ReturnValueDefinition,
+    ReturnValueInnerFormat,
+    ReturnValueOuterFormat,
+    parse_function_definition
+)
 
 
 def test_simple():
@@ -57,7 +64,7 @@ def test_default_args():
 
 def test_returns_outer_iterator():
     assert parse_function_definition(
-        f'def Foo() -> Iterator[Tuple]: ...'
+        'def Foo() -> Iterator[Tuple]: ...'
     ) == FunctionDefinition(
         name='Foo',
         args=[],
@@ -70,7 +77,7 @@ def test_returns_outer_iterator():
 
 def test_returns_outer_list():
     assert parse_function_definition(
-        f'def Foo() -> List[Tuple]: ...'
+        'def Foo() -> List[Tuple]: ...'
     ) == FunctionDefinition(
         name='Foo',
         args=[],
@@ -83,7 +90,7 @@ def test_returns_outer_list():
 
 def test_returns_outer_single():
     assert parse_function_definition(
-        f'def Foo() -> Single[Tuple]: ...'
+        'def Foo() -> Single[Tuple]: ...'
     ) == FunctionDefinition(
         name='Foo',
         args=[],
@@ -96,7 +103,7 @@ def test_returns_outer_single():
 
 def test_returns_inner_tuple():
     assert parse_function_definition(
-        f'def Foo() -> Single[Tuple]: ...'
+        'def Foo() -> Single[Tuple]: ...'
     ) == FunctionDefinition(
         name='Foo',
         args=[],
@@ -109,7 +116,7 @@ def test_returns_inner_tuple():
 
 def test_returns_inner_dict():
     assert parse_function_definition(
-        f'def Foo() -> Single[Dict]: ...'
+        'def Foo() -> Single[Dict]: ...'
     ) == FunctionDefinition(
         name='Foo',
         args=[],
@@ -122,7 +129,7 @@ def test_returns_inner_dict():
 
 def test_returns_inner_list():
     assert parse_function_definition(
-        f'def Foo() -> Single[List]: ...'
+        'def Foo() -> Single[List]: ...'
     ) == FunctionDefinition(
         name='Foo',
         args=[],
@@ -135,7 +142,7 @@ def test_returns_inner_list():
 
 def test_returns_inner_custom():
     assert parse_function_definition(
-        f'def Foo() -> Single[MyType]: ...'
+        'def Foo() -> Single[MyType]: ...'
     ) == FunctionDefinition(
         name='Foo',
         args=[],
