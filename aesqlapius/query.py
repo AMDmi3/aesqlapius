@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Dict, Iterator, Optional, Tuple
+from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 from aesqlapius.function_def import FunctionDefinition, parse_function_definition
 
@@ -9,7 +9,7 @@ class Query:
     text: str
 
 
-def parse_query(path: str) -> Query:
+def parse_query_file(path: str) -> List[Query]:
     func_def: Optional[FunctionDefinition] = None
     text = ''
 
@@ -22,4 +22,4 @@ def parse_query(path: str) -> Query:
 
     assert(func_def)
 
-    return Query(func_def, text)
+    return [Query(func_def, text)]
