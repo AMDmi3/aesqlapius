@@ -17,6 +17,7 @@ jobs:
           pip install codecov
       - name: Prepare PostgreSQL database
         run: |
+          sudo sed -i -e 's|peer|trust|' /etc/postgresql/*/main/pg_hba.conf
           sudo service postgresql start
           sudo -u postgres psql -c "CREATE DATABASE aesqlapius_test"
           sudo -u postgres psql -c "CREATE USER aesqlapius_test WITH PASSWORD 'aesqlapius_test'"
