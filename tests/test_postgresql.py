@@ -15,18 +15,11 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-def test_generate_bind(original_datadir):
+def test_generate_default(original_datadir):
     db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
     api = generate_api(original_datadir, db)
 
     assert api.ping() == {'pong': True}
-
-
-def test_generate_file_as_ns(original_datadir):
-    db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
-    api = generate_api(original_datadir, db, file_as_namespace=True)
-
-    assert api.ping.ping() == {'pong': True}
 
 
 def test_generate_nobind(original_datadir):
@@ -48,74 +41,101 @@ def test_generate_target(original_datadir):
     assert db.ping() == {'pong': True}
 
 
+def test_generate_ns_default(original_datadir):
+    db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
+    api = generate_api(original_datadir / 'sub', db)
+
+    assert api.a() == ('a',)
+    assert api.b() == ('b',)
+
+
+def test_generate_ns_file(original_datadir):
+    db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
+    api = generate_api(original_datadir / 'sub', db, file_as_namespace=True)
+
+    assert api.a.a() == ('a',)
+    assert api.b.b() == ('b',)
+
+
+def test_generate_ns_file_altroot(original_datadir):
+    db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
+    api = generate_api(original_datadir / 'sub', db, file_as_namespace=True, namespace_root='a')
+
+    assert api.a() == ('a',)
+    assert api.b.b() == ('b',)
+
+
 @pytest.fixture(scope='module')
 def api(original_datadir):
     db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
     return generate_api(original_datadir, db)
 
 
-def test_init(api):
-    api.create()
-    api.insert()  # 0, 'foo' as default
-    api.insert(1, 'bar')
-    api.insert(2, 'baz')
+def test_pass_args(api):
+    assert(api.swap_args() == ('a', 0))
+    assert(api.swap_args(1) == ('a', 1))
+    assert(api.swap_args(a=1) == ('a', 1))
+    assert(api.swap_args(b='b') == ('b', 0))
+    assert(api.swap_args(1, 'b') == ('b', 1))
+    assert(api.swap_args(a=1, b='b') == ('b', 1))
+    assert(api.swap_args(b='b', a=1) == ('b', 1))
 
 
 def test_get_iterator_tuple(api):
-    it = api.getters.iterator_tuple()
+    it = api.get.iterator_tuple()
     assert(isinstance(it, Iterator))
-    assert(next(it) == (0, 'foo'))
-    assert(next(it) == (1, 'bar'))
-    assert(next(it) == (2, 'baz'))
+    assert(next(it) == (0, 'a'))
+    assert(next(it) == (1, 'b'))
+    assert(next(it) == (2, 'c'))
 
 
 def test_get_iterator_dict(api):
-    it = api.getters.iterator_dict()
+    it = api.get.iterator_dict()
     assert(isinstance(it, Iterator))
-    assert(next(it) == {'a': 0, 'b': 'foo'})
-    assert(next(it) == {'a': 1, 'b': 'bar'})
-    assert(next(it) == {'a': 2, 'b': 'baz'})
+    assert(next(it) == {'a': 0, 'b': 'a'})
+    assert(next(it) == {'a': 1, 'b': 'b'})
+    assert(next(it) == {'a': 2, 'b': 'c'})
 
 
 def test_get_iterator_list(api):
-    it = api.getters.iterator_list()
+    it = api.get.iterator_list()
     assert(isinstance(it, Iterator))
-    assert(next(it) == [0, 'foo'])
-    assert(next(it) == [1, 'bar'])
-    assert(next(it) == [2, 'baz'])
+    assert(next(it) == [0, 'a'])
+    assert(next(it) == [1, 'b'])
+    assert(next(it) == [2, 'c'])
 
 
 def test_get_list_tuple(api):
-    assert api.getters.list_tuple() == [
-        (0, 'foo'),
-        (1, 'bar'),
-        (2, 'baz'),
+    assert api.get.list_tuple() == [
+        (0, 'a'),
+        (1, 'b'),
+        (2, 'c'),
     ]
 
 
 def test_get_list_dict(api):
-    assert api.getters.list_dict() == [
-        {'a': 0, 'b': 'foo'},
-        {'a': 1, 'b': 'bar'},
-        {'a': 2, 'b': 'baz'},
+    assert api.get.list_dict() == [
+        {'a': 0, 'b': 'a'},
+        {'a': 1, 'b': 'b'},
+        {'a': 2, 'b': 'c'},
     ]
 
 
 def test_get_list_list(api):
-    assert api.getters.list_list() == [
-        [0, 'foo'],
-        [1, 'bar'],
-        [2, 'baz'],
+    assert api.get.list_list() == [
+        [0, 'a'],
+        [1, 'b'],
+        [2, 'c'],
     ]
 
 
 def test_get_single_tuple(api):
-    assert api.getters.single_tuple() == (0, 'foo')
+    assert api.get.single_tuple() == (0, 'a')
 
 
 def test_get_single_dict(api):
-    assert api.getters.single_dict() == {'a': 0, 'b': 'foo'}
+    assert api.get.single_dict() == {'a': 0, 'b': 'a'}
 
 
 def test_get_single_list(api):
-    assert api.getters.single_list() == [0, 'foo']
+    assert api.get.single_list() == [0, 'a']

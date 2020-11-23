@@ -1,3 +1,0 @@
--- def insert(a=0, b='foo') -> None: ...
-
-INSERT INTO test VALUES(%(a)s, %(b)s);
