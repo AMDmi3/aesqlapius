@@ -4,7 +4,7 @@ from typing import Any, Callable, Dict, List, Tuple, Union
 from aesqlapius.function_def import ReturnValueInnerFormat
 
 def generate_row_processor(inner_format: Union[ReturnValueInnerFormat, str], field_names: List[str], stack_depth: int = 2) -> Callable[[Tuple[Any]], Any]:
-    if not isinstance(inner_format, ReturnValueInnerFormat):
+    if isinstance(inner_format, str):
         def process_row(row: Tuple[Any]) -> Dict[str, Any]:
             # get the frame of method caller; usually,
             # [0] is process_row
@@ -35,7 +35,7 @@ def generate_row_processor(inner_format: Union[ReturnValueInnerFormat, str], fie
             return list(row)
 
     else:
-        assert(False)
+        raise NotImplementedError(f"unsupported inner return type format '{inner_format}'")  # pragma: no cover
 
     return process_row
 
