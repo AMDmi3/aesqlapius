@@ -22,7 +22,11 @@ jobs:
           sudo -u postgres psql -c "CREATE DATABASE aesqlapius_test"
           sudo -u postgres psql -c "CREATE USER aesqlapius_test WITH PASSWORD 'aesqlapius_test'"
           sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE aesqlapius_test TO aesqlapius_test"
+      - name: Run flake8
+        run: make flake8
+      - name: Run mypy
+        run: make mypy
       - name: Run unit tests
-        run: pytest -v -rs --cov-report=xml --cov=aesqlapius tests/
+        run: make test
       - name: Push coverage info
         run: codecov
