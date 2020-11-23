@@ -29,48 +29,48 @@ def test_init(api):
     api.insert(2, 'baz')
 
 
-def test_getall_iterator_tuple(api):
-    it = api.getall_iterator_tuple()
+def test_get_iterator_tuple(api):
+    it = api.getters.iterator_tuple()
     assert(isinstance(it, Iterator))
     assert(next(it) == (0, 'foo'))
     assert(next(it) == (1, 'bar'))
     assert(next(it) == (2, 'baz'))
 
 
-def test_getall_iterator_dict(api):
-    it = api.getall_iterator_dict()
+def test_get_iterator_dict(api):
+    it = api.getters.iterator_dict()
     assert(isinstance(it, Iterator))
     assert(next(it) == {'a': 0, 'b': 'foo'})
     assert(next(it) == {'a': 1, 'b': 'bar'})
     assert(next(it) == {'a': 2, 'b': 'baz'})
 
 
-def test_getall_iterator_list(api):
-    it = api.getall_iterator_list()
+def test_get_iterator_list(api):
+    it = api.getters.iterator_list()
     assert(isinstance(it, Iterator))
     assert(next(it) == [0, 'foo'])
     assert(next(it) == [1, 'bar'])
     assert(next(it) == [2, 'baz'])
 
 
-def test_getall_list_tuple(api):
-    assert api.getall_list_tuple() == [
+def test_get_list_tuple(api):
+    assert api.getters.list_tuple() == [
         (0, 'foo'),
         (1, 'bar'),
         (2, 'baz'),
     ]
 
 
-def test_getall_list_dict(api):
-    assert api.getall_list_dict() == [
+def test_get_list_dict(api):
+    assert api.getters.list_dict() == [
         {'a': 0, 'b': 'foo'},
         {'a': 1, 'b': 'bar'},
         {'a': 2, 'b': 'baz'},
     ]
 
 
-def test_getall_list_list(api):
-    assert api.getall_list_list() == [
+def test_get_list_list(api):
+    assert api.getters.list_list() == [
         [0, 'foo'],
         [1, 'bar'],
         [2, 'baz'],
@@ -78,12 +78,12 @@ def test_getall_list_list(api):
 
 
 def test_get_single_tuple(api):
-    assert api.get_single_tuple() == (0, 'foo')
+    assert api.getters.single_tuple() == (0, 'foo')
 
 
 def test_get_single_dict(api):
-    assert api.get_single_dict() == {'a': 0, 'b': 'foo'}
+    assert api.getters.single_dict() == {'a': 0, 'b': 'foo'}
 
 
 def test_get_single_list(api):
-    assert api.get_single_list() == [0, 'foo']
+    assert api.getters.single_list() == [0, 'foo']
