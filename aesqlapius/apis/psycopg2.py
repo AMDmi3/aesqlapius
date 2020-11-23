@@ -49,14 +49,15 @@ def _generate_method(query: Query) -> Callable[..., Any]:
     return method
 
 
-def generate_api(db: Any, path: str) -> Namespace:
+def generate_api(db: Any, path: str, file_as_namespace=False) -> Namespace:
     ns = Namespace()
 
     for entry, queries in iter_query_dir(path, '.sql'):
         for query in queries:
+            namespace_path = entry.namespace_path if file_as_namespace else entry.namespace_path[:-1]
             inject_method(
                 ns,
-                entry.namespace_path[:-1] + [query.func_def.name],
+                namespace_path + [query.func_def.name],
                 functools.partial(_generate_method(query), db)
             )
 
