@@ -1,7 +1,8 @@
 from dataclasses import dataclass
-from typing import Any, Dict, Iterator, List, Optional, Tuple
+from typing import List, Optional
 
 from aesqlapius.function_def import FunctionDefinition, parse_function_definition
+
 
 @dataclass
 class Query:

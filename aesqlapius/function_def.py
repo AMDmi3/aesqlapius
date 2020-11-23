@@ -1,7 +1,7 @@
-from enum import Enum, unique
-from dataclasses import dataclass, field
-from typing import Any, List, Optional, Union
 import ast
+from dataclasses import dataclass, field
+from enum import Enum, unique
+from typing import Any, List, Optional, Union
 
 
 @dataclass
@@ -17,7 +17,7 @@ class ReturnValueOuterFormat(Enum):
     ITERATOR = 1
     LIST = 2
     SINGLE = 3
-    #DICT = 4  # TODO
+    # DICT = 4  # TODO
 
 
 @unique
@@ -53,8 +53,8 @@ def parse_function_definition(source: str) -> FunctionDefinition:
     # parse arguments
     for arg in func.args.args:
         arg_def = ArgumentDefinition(
-            name = arg.arg,
-            type_ = arg.annotation.id if arg.annotation else None  # XXX: complex type parsing
+            name=arg.arg,
+            type_=arg.annotation.id if arg.annotation else None  # type: ignore
         )
 
         func_def.args.append(arg_def)
@@ -76,23 +76,23 @@ def parse_function_definition(source: str) -> FunctionDefinition:
     else:
         assert(isinstance(returns, ast.Subscript))
 
-        if returns.value.id in ('List', 'list'):
+        if returns.value.id in ('List', 'list'):  # type: ignore
             outer_format = ReturnValueOuterFormat.LIST
-        elif returns.value.id == 'Iterator':
+        elif returns.value.id == 'Iterator':  # type: ignore
             outer_format = ReturnValueOuterFormat.ITERATOR
-        elif returns.value.id == 'Single':
+        elif returns.value.id == 'Single':  # type: ignore
             outer_format = ReturnValueOuterFormat.SINGLE
         else:
-            raise TypeError(f'Unexpected return value type {returns.value.id}')
+            raise TypeError(f'Unexpected return value type {returns.value.id}')  # type: ignore
 
-        if returns.slice.id in ('Tuple', 'tuple'):
+        if returns.slice.id in ('Tuple', 'tuple'):  # type: ignore
             inner_format = ReturnValueInnerFormat.TUPLE
-        elif returns.slice.id in ('Dict', 'dict'):
+        elif returns.slice.id in ('Dict', 'dict'):  # type: ignore
             inner_format = ReturnValueInnerFormat.DICT
-        elif returns.slice.id in ('List', 'list'):
+        elif returns.slice.id in ('List', 'list'):  # type: ignore
             inner_format = ReturnValueInnerFormat.LIST
         else:  # custom type
-            inner_format = returns.slice.id
+            inner_format = returns.slice.id  # type: ignore
 
         func_def.returns = ReturnValueDefinition(outer_format, inner_format)
 

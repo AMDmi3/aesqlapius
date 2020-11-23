@@ -1,12 +1,12 @@
 import functools
-from typing import Any, Callable, Union
+from typing import Any, Callable
 
+from aesqlapius.args import prepare_args_as_dict
+from aesqlapius.function_def import ReturnValueOuterFormat
+from aesqlapius.namespace import Namespace, inject_method
+from aesqlapius.output import generate_row_processor
 from aesqlapius.query import Query
 from aesqlapius.querydir import iter_query_dir
-from aesqlapius.args import prepare_args_as_dict
-from aesqlapius.output import generate_row_processor
-from aesqlapius.namespace import Namespace, inject_method
-from aesqlapius.function_def import ReturnValueOuterFormat
 
 
 def _generate_method(query: Query) -> Callable[..., Any]:
