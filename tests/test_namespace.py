@@ -30,6 +30,6 @@ def test_duplicate_method(root, method):
 
 
 def test_duplicate_method_ns(root, method):
-    inject_method(root, ['subns', 'method'], method)
+    inject_method(root, ['subns'], method)
     with pytest.raises(ValueError):
-        inject_method(root, ['subns'], method)
+        inject_method(root, ['subns', 'method'], method)
