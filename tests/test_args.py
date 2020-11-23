@@ -95,3 +95,13 @@ def test_list_as_list(func_def):
         'e',
         6
     ]
+
+
+def test_missing_args(func_def):
+    with pytest.raises(TypeError):
+        prepare_args_as_list(func_def, [], {})
+
+
+def test_duplicate_args(func_def):
+    with pytest.raises(TypeError):
+        prepare_args_as_list(func_def, ['a'], {'a': 'a'})
