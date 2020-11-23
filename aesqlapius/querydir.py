@@ -15,7 +15,7 @@ def _walk_dir_tree(path: str, extension: str, namespace_path: Optional[List[str]
     with os.scandir(path) as it:
         for entry in it:
             if entry.is_dir():
-                yield from _walk_dir_path(
+                yield from _walk_dir_tree(
                     os.path.join(path, entry.name),
                     extension,
                     (namespace_path or []) + [entry.name]
