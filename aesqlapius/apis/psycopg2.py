@@ -83,6 +83,7 @@ def generate_api(
     *,
     file_as_namespace: bool = False,
     extension: str = '.sql',
+    namespace_root: str = '__init__',
 ) -> Namespace:
     ...  # pragma: no cover
 
@@ -95,6 +96,7 @@ def generate_api(
     target: T,
     file_as_namespace: bool = False,
     extension: str = '.sql',
+    namespace_root: str = '__init__',
 ) -> T:
     ...  # pragma: no cover
 
@@ -106,6 +108,7 @@ def generate_api(
     target: Optional[T] = None,
     file_as_namespace: bool = False,
     extension: str = '.sql',
+    namespace_root: str = '__init__',
 ) -> Union[T, Namespace]:
     ns: Union[T, Namespace]
     if target is None:
@@ -114,8 +117,12 @@ def generate_api(
         ns = target
 
     for entry, queries in iter_query_dir(path, extension):
+        if file_as_namespace and entry.namespace_path[-1] != namespace_root:
+            namespace_path = entry.namespace_path
+        else:
+            namespace_path = entry.namespace_path[:-1]
+
         for query in queries:
-            namespace_path = entry.namespace_path if file_as_namespace else entry.namespace_path[:-1]
             inject_method(
                 ns,
                 namespace_path + [query.func_def.name],
