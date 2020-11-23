@@ -75,3 +75,15 @@ def test_getall_list_list(api):
         [1, 'bar'],
         [2, 'baz'],
     ]
+
+
+def test_get_single_tuple(api):
+    assert api.get_single_tuple() == (0, 'foo')
+
+
+def test_get_single_dict(api):
+    assert api.get_single_dict() == {'a': 0, 'b': 'foo'}
+
+
+def test_get_single_list(api):
+    assert api.get_single_list() == [0, 'foo']
