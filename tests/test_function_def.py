@@ -1,3 +1,5 @@
+import pytest
+
 from aesqlapius.function_def import *
 
 
@@ -75,3 +77,8 @@ def test_returns():
             args=[],
             returns=ReturnValueDefinition(outer_format=outer_format, inner_format=inner_format)
         )
+
+
+def test_returns_invalid():
+    with pytest.raises(TypeError):
+        parse_function_definition('def Foo() -> BadType[List]: ...')

@@ -83,7 +83,7 @@ def parse_function_definition(source: str) -> FunctionDefinition:
         elif returns.value.id == 'Single':
             outer_format = ReturnValueOuterFormat.SINGLE
         else:
-            raise RuntimeError(f'Unexpected return value type {returns.value.id}')
+            raise TypeError(f'Unexpected return value type {returns.value.id}')
 
         if returns.slice.id in ('Tuple', 'tuple'):
             inner_format = ReturnValueInnerFormat.TUPLE
