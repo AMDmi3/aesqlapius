@@ -55,28 +55,95 @@ def test_default_args():
     )
 
 
-def test_returns():
-    cases = [
-        ('Iterator[Tuple]', ReturnValueOuterFormat.ITERATOR, ReturnValueInnerFormat.TUPLE),
-        ('Iterator[Dict]', ReturnValueOuterFormat.ITERATOR, ReturnValueInnerFormat.DICT),
-        ('Iterator[List]', ReturnValueOuterFormat.ITERATOR, ReturnValueInnerFormat.LIST),
-        ('List[Tuple]', ReturnValueOuterFormat.LIST, ReturnValueInnerFormat.TUPLE),
-        ('List[Dict]', ReturnValueOuterFormat.LIST, ReturnValueInnerFormat.DICT),
-        ('List[List]', ReturnValueOuterFormat.LIST, ReturnValueInnerFormat.LIST),
-        ('Single[Tuple]', ReturnValueOuterFormat.SINGLE, ReturnValueInnerFormat.TUPLE),
-        ('Single[Dict]', ReturnValueOuterFormat.SINGLE, ReturnValueInnerFormat.DICT),
-        ('Single[List]', ReturnValueOuterFormat.SINGLE, ReturnValueInnerFormat.LIST),
-        ('Single[MyType]', ReturnValueOuterFormat.SINGLE, 'MyType'),
-    ]
-
-    for returns, outer_format, inner_format in cases:
-        assert parse_function_definition(
-            f'def Foo() -> {returns}: ...'
-        ) == FunctionDefinition(
-            name='Foo',
-            args=[],
-            returns=ReturnValueDefinition(outer_format=outer_format, inner_format=inner_format)
+def test_returns_outer_iterator():
+    assert parse_function_definition(
+        f'def Foo() -> Iterator[Tuple]: ...'
+    ) == FunctionDefinition(
+        name='Foo',
+        args=[],
+        returns=ReturnValueDefinition(
+            outer_format=ReturnValueOuterFormat.ITERATOR,
+            inner_format=ReturnValueInnerFormat.TUPLE
         )
+    )
+
+
+def test_returns_outer_list():
+    assert parse_function_definition(
+        f'def Foo() -> List[Tuple]: ...'
+    ) == FunctionDefinition(
+        name='Foo',
+        args=[],
+        returns=ReturnValueDefinition(
+            outer_format=ReturnValueOuterFormat.LIST,
+            inner_format=ReturnValueInnerFormat.TUPLE
+        )
+    )
+
+
+def test_returns_outer_single():
+    assert parse_function_definition(
+        f'def Foo() -> Single[Tuple]: ...'
+    ) == FunctionDefinition(
+        name='Foo',
+        args=[],
+        returns=ReturnValueDefinition(
+            outer_format=ReturnValueOuterFormat.SINGLE,
+            inner_format=ReturnValueInnerFormat.TUPLE
+        )
+    )
+
+
+def test_returns_inner_tuple():
+    assert parse_function_definition(
+        f'def Foo() -> Single[Tuple]: ...'
+    ) == FunctionDefinition(
+        name='Foo',
+        args=[],
+        returns=ReturnValueDefinition(
+            outer_format=ReturnValueOuterFormat.SINGLE,
+            inner_format=ReturnValueInnerFormat.TUPLE
+        )
+    )
+
+
+def test_returns_inner_dict():
+    assert parse_function_definition(
+        f'def Foo() -> Single[Dict]: ...'
+    ) == FunctionDefinition(
+        name='Foo',
+        args=[],
+        returns=ReturnValueDefinition(
+            outer_format=ReturnValueOuterFormat.SINGLE,
+            inner_format=ReturnValueInnerFormat.DICT
+        )
+    )
+
+
+def test_returns_inner_list():
+    assert parse_function_definition(
+        f'def Foo() -> Single[List]: ...'
+    ) == FunctionDefinition(
+        name='Foo',
+        args=[],
+        returns=ReturnValueDefinition(
+            outer_format=ReturnValueOuterFormat.SINGLE,
+            inner_format=ReturnValueInnerFormat.LIST
+        )
+    )
+
+
+def test_returns_inner_custom():
+    assert parse_function_definition(
+        f'def Foo() -> Single[MyType]: ...'
+    ) == FunctionDefinition(
+        name='Foo',
+        args=[],
+        returns=ReturnValueDefinition(
+            outer_format=ReturnValueOuterFormat.SINGLE,
+            inner_format='MyType'
+        )
+    )
 
 
 def test_returns_invalid():
