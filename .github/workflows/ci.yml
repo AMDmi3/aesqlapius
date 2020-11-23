@@ -28,5 +28,7 @@ jobs:
         run: make mypy
       - name: Run unit tests
         run: make test
+        env:
+          PYTEST_ARGS: --cov-report=xml --cov=aesqlapius
       - name: Push coverage info
         run: codecov
