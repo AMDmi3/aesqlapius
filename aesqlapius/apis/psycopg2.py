@@ -78,12 +78,12 @@ T = TypeVar('T')
 
 @overload
 def generate_api(path: str, db: Any = None, *, file_as_namespace: bool = False) -> Namespace:
-    ...
+    ...  # pragma: no cover
 
 
 @overload
 def generate_api(path: str, db: Any = None, *, target: T, file_as_namespace: bool = False) -> T:
-    ...
+    ...  # pragma: no cover
 
 
 def generate_api(path: str, db: Any = None, *, target: Optional[T] = None, file_as_namespace: bool = False) -> Union[T, Namespace]:
