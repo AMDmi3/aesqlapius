@@ -5,7 +5,6 @@ import pytest
 
 from aesqlapius.apis.psycopg2 import generate_api
 
-
 psycopg2 = pytest.importorskip('psycopg2')
 pytest_datadir = pytest.importorskip('pytest_datadir')
 
