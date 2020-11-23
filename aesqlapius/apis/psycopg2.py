@@ -1,5 +1,14 @@
 import functools
-from typing import Any, Callable, Iterator, List, Optional, TypeVar, Union, overload
+from typing import (
+    Any,
+    Callable,
+    Iterator,
+    List,
+    Optional,
+    TypeVar,
+    Union,
+    overload
+)
 
 from aesqlapius.args import prepare_args_as_dict
 from aesqlapius.function_def import ReturnValueOuterFormat
