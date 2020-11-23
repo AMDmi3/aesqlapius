@@ -57,3 +57,10 @@ def test_custom_global(row, field_names):
     rp = generate_row_processor('MyGlobalType', field_names, 1)
 
     assert rp(row) == MyGlobalType(1, 2, 3)
+
+
+def test_custom_not_found(row, field_names):
+    rp = generate_row_processor('MyNonexistingType', field_names, 1)
+
+    with pytest.raises(NameError):
+        rp(row)
