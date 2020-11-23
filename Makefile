@@ -3,7 +3,7 @@ FLAKE8?=	flake8
 MYPY?=		mypy
 ISORT?=		isort
 
-all: test flake8 mypy
+lint: test flake8 mypy isort-check
 
 test::
 	${PYTEST} ${PYTEST_ARGS} -v -rs -p pytest-datadir
@@ -13,6 +13,9 @@ flake8::
 
 mypy::
 	${MYPY} ${MYPY_ARGS} aesqlapius
+
+isort-check::
+	${ISORT} ${ISORT_ARGS} --check aesqlapius/**/*.py tests/*.py
 
 isort::
 	${ISORT} ${ISORT_ARGS} aesqlapius/**/*.py tests/*.py
