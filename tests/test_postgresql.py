@@ -15,6 +15,39 @@ pytestmark = pytest.mark.skipif(
 )
 
 
+def test_generate_bind(original_datadir):
+    db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
+    api = generate_api(original_datadir, db)
+
+    assert api.ping() == {'pong': True}
+
+
+def test_generate_file_as_ns(original_datadir):
+    db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
+    api = generate_api(original_datadir, db, file_as_namespace=True)
+
+    assert api.ping.ping() == {'pong': True}
+
+
+def test_generate_nobind(original_datadir):
+    api = generate_api(original_datadir)
+
+    db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
+
+    assert api.ping(db) == {'pong': True}
+
+
+def test_generate_target(original_datadir):
+    class MyDB():
+        def __init__(self, dsn: str) -> None:
+            self.db = psycopg2.connect(dsn)
+            generate_api(original_datadir, self.db, target=self)
+
+    db = MyDB(os.environ.get('POSTGRESQL_DSN'))
+
+    assert db.ping() == {'pong': True}
+
+
 @pytest.fixture(scope='module')
 def api(original_datadir):
     db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
