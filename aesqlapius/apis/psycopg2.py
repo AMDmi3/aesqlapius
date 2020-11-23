@@ -44,7 +44,7 @@ def _generate_method(query: Query) -> Callable[..., Any]:
                 return process_row(cur.fetchone())
 
     else:
-        assert(False)
+        raise NotImplementedError(f"unsupported outer return type format '{returns.outer_format}'")  # pragma: no cover
 
     return method
 
