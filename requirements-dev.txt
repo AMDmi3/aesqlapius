@@ -3,4 +3,5 @@ mypy
 psycopg2
 pytest
 pytest-cov
-pytest-datadir
+#pytest-datadir
+git+git://github.com/AMDmi3/pytest-datadir@patch-1#egg=pytest-datadir
