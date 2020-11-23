@@ -5,7 +5,7 @@ class Namespace:
     pass
 
 
-def inject_method(root: Namespace, namespace_path: List[str], method: Callable[..., Any]) -> None:
+def inject_method(root: Any, namespace_path: List[str], method: Callable[..., Any]) -> None:
     target = root
 
     for name in namespace_path[:-1]:
