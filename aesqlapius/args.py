@@ -3,7 +3,7 @@ from typing import Any, Dict, Iterator, List, Tuple
 from aesqlapius.function_def import ArgumentDefinition, FunctionDefinition
 
 
-def _iter_args(func_def: FunctionDefinition, args: List[Any], kwargs: Dict[str, Any]) -> Iterator[Tuple[ArgumentDefinition, Any]]:
+def _iter_args(func_def: FunctionDefinition, args: Tuple[Any, ...], kwargs: Dict[str, Any]) -> Iterator[Tuple[ArgumentDefinition, Any]]:
     for narg, arg in enumerate(func_def.args):
         print(arg)
         value: Any = None
@@ -21,9 +21,9 @@ def _iter_args(func_def: FunctionDefinition, args: List[Any], kwargs: Dict[str, 
         yield arg, value
 
 
-def prepare_args_as_dict(func_def: FunctionDefinition, args: List[Any], kwargs: Dict[str, Any]) -> Dict[str, Any]:
+def prepare_args_as_dict(func_def: FunctionDefinition, args: Tuple[Any, ...], kwargs: Dict[str, Any]) -> Dict[str, Any]:
     return {arg.name: value for arg, value in _iter_args(func_def, args, kwargs)}
 
 
-def prepare_args_as_list(func_def, args: List[Any], kwargs: Dict[str, Any]) -> List[Any]:
+def prepare_args_as_list(func_def, args: Tuple[Any, ...], kwargs: Dict[str, Any]) -> List[Any]:
     return [value for arg, value in _iter_args(func_def, args, kwargs)]

@@ -1,5 +1,5 @@
 import functools
-from typing import Any, Callable
+from typing import Any, Callable, Iterator, List
 
 from aesqlapius.args import prepare_args_as_dict
 from aesqlapius.function_def import ReturnValueOuterFormat
@@ -14,39 +14,47 @@ def _generate_method(query: Query) -> Callable[..., Any]:
     returns = func_def.returns
 
     if returns is None:
-        def method(db, *args, **kwargs) -> None:
+        def method_returning_none(db, *args, **kwargs) -> None:
             with db.cursor() as cur:
                 cur.execute(query.text, prepare_args_as_dict(func_def, args, kwargs))
-        return method
 
-    if returns.outer_format == ReturnValueOuterFormat.ITERATOR:
-        def method(db, *args, **kwargs) -> None:
+        return method_returning_none
+
+    elif returns.outer_format == ReturnValueOuterFormat.ITERATOR:
+        def method_returning_iterator(db, *args, **kwargs) -> Iterator[Any]:
+            assert(returns is not None)  # mypy bug
             with db.cursor() as cur:
                 cur.execute(query.text, prepare_args_as_dict(func_def, args, kwargs))
                 names = [desc.name for desc in cur.description]
                 process_row = generate_row_processor(returns.inner_format, names)
                 yield from map(process_row, cur)
 
+        return method_returning_iterator
+
     elif returns.outer_format == ReturnValueOuterFormat.LIST:
-        def method(db, *args, **kwargs) -> None:
+        def method_returning_list(db, *args, **kwargs) -> List[Any]:
+            assert(returns is not None)  # mypy bug
             with db.cursor() as cur:
                 cur.execute(query.text, prepare_args_as_dict(func_def, args, kwargs))
                 names = [desc.name for desc in cur.description]
                 process_row = generate_row_processor(returns.inner_format, names)
                 return [process_row(row) for row in cur]
 
+        return method_returning_list
+
     elif returns.outer_format == ReturnValueOuterFormat.SINGLE:
-        def method(db, *args, **kwargs) -> None:
+        def method_returning_single(db, *args, **kwargs) -> Any:
+            assert(returns is not None)  # mypy bug
             with db.cursor() as cur:
                 cur.execute(query.text, prepare_args_as_dict(func_def, args, kwargs))
                 names = [desc.name for desc in cur.description]
                 process_row = generate_row_processor(returns.inner_format, names)
                 return process_row(cur.fetchone())
 
+        return method_returning_single
+
     else:
         raise NotImplementedError(f"unsupported outer return type format '{returns.outer_format}'")  # pragma: no cover
-
-    return method
 
 
 def generate_api(db: Any, path: str, file_as_namespace=False) -> Namespace:
