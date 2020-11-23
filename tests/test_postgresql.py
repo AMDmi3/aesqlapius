@@ -18,7 +18,7 @@ pytestmark = pytest.mark.skipif(
 @pytest.fixture(scope='module')
 def api(original_datadir):
     db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
-    return generate_api(db, original_datadir)
+    return generate_api(original_datadir, db)
 
 
 def test_init(api):

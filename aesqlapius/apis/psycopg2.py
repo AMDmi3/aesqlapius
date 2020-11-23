@@ -1,5 +1,5 @@
 import functools
-from typing import Any, Callable, Iterator, List
+from typing import Any, Callable, Iterator, List, Optional, TypeVar, Union, overload
 
 from aesqlapius.args import prepare_args_as_dict
 from aesqlapius.function_def import ReturnValueOuterFormat
@@ -57,8 +57,32 @@ def _generate_method(query: Query) -> Callable[..., Any]:
         raise NotImplementedError(f"unsupported outer return type format '{returns.outer_format}'")  # pragma: no cover
 
 
-def generate_api(db: Any, path: str, file_as_namespace=False) -> Namespace:
-    ns = Namespace()
+def _maybe_bind(query: Query, db: Any) -> Callable[..., Any]:
+    if db is None:
+        return _generate_method(query)
+    else:
+        return functools.partial(_generate_method(query), db)
+
+
+T = TypeVar('T')
+
+
+@overload
+def generate_api(path: str, db: Any = None, *, file_as_namespace: bool = False) -> Namespace:
+    ...
+
+
+@overload
+def generate_api(path: str, db: Any = None, *, target: T, file_as_namespace: bool = False) -> T:
+    ...
+
+
+def generate_api(path: str, db: Any = None, *, target: Optional[T] = None, file_as_namespace: bool = False) -> Union[T, Namespace]:
+    ns: Union[T, Namespace]
+    if target is None:
+        ns = Namespace()
+    else:
+        ns = target
 
     for entry, queries in iter_query_dir(path, '.sql'):
         for query in queries:
@@ -66,7 +90,7 @@ def generate_api(db: Any, path: str, file_as_namespace=False) -> Namespace:
             inject_method(
                 ns,
                 namespace_path + [query.func_def.name],
-                functools.partial(_generate_method(query), db)
+                _maybe_bind(query, db)
             )
 
     return ns
