@@ -64,6 +64,7 @@ def test_returns():
         ('Single[Tuple]', ReturnValueOuterFormat.SINGLE, ReturnValueInnerFormat.TUPLE),
         ('Single[Dict]', ReturnValueOuterFormat.SINGLE, ReturnValueInnerFormat.DICT),
         ('Single[List]', ReturnValueOuterFormat.SINGLE, ReturnValueInnerFormat.LIST),
+        ('Single[MyType]', ReturnValueOuterFormat.SINGLE, 'MyType'),
     ]
 
     for returns, outer_format, inner_format in cases:
