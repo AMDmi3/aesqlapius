@@ -1,0 +1,3 @@
+-- def ping() -> Single[Dict]: ...
+
+SELECT TRUE AS pong;
