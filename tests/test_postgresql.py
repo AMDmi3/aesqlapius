@@ -65,7 +65,7 @@ def test_generate_ns_file_altroot(original_datadir):
     assert api.b.b() == ('b',)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture()
 def api(original_datadir):
     db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
     return generate_api(original_datadir, db)
