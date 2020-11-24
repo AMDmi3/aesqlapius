@@ -81,6 +81,10 @@ def test_pass_args(api):
     assert(api.swap_args(b='b', a=1) == ('b', 1))
 
 
+def test_get_nothing(api):
+    api.get.nothing()
+
+
 def test_get_iterator_tuple(api):
     it = api.get.iterator_tuple()
     assert(isinstance(it, Iterator))

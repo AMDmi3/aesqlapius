@@ -1,3 +1,6 @@
+-- def nothing() -> None: ...
+SELECT;
+
 -- def single_dict() -> Single[Dict]: ...
 SELECT 0 AS a, 'a' AS b;
 
