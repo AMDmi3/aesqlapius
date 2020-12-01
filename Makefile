@@ -3,6 +3,7 @@ FLAKE8?=	flake8
 MYPY?=		mypy
 ISORT?=		isort
 PYTHON?=	python3
+TWINE?=		twine
 
 lint: test flake8 mypy isort-check
 
@@ -23,3 +24,8 @@ isort::
 
 sdist::
 	${PYTHON} setup.py sdist
+
+release::
+	rm -rf dist
+	${PYTHON} setup.py sdist
+	${TWINE} upload dist/*.tar.gz
