@@ -41,28 +41,36 @@ def test_generate_target(original_datadir):
     assert db.ping() == {'pong': True}
 
 
-def test_generate_ns_default(original_datadir):
+def test_generate_ns_dirs(original_datadir):
     db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
-    api = generate_api(original_datadir / 'sub', 'psycopg2', db)
+    api = generate_api(original_datadir / 'sub', 'psycopg2', db, namespace_mode='dirs')
 
-    assert api.a() == ('a',)
-    assert api.b() == ('b',)
+    assert api.root.func_a() == ('a',)
+    assert api.root.func_b() == ('b',)
 
 
-def test_generate_ns_file(original_datadir):
+def test_generate_ns_files(original_datadir):
     db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
-    api = generate_api(original_datadir / 'sub', 'psycopg2', db, file_as_namespace=True)
+    api = generate_api(original_datadir / 'sub', 'psycopg2', db, namespace_mode='files')
 
-    assert api.a.a() == ('a',)
-    assert api.b.b() == ('b',)
+    assert api.root.file_a.func_a() == ('a',)
+    assert api.root.file_b.func_b() == ('b',)
 
 
-def test_generate_ns_file_altroot(original_datadir):
+def test_generate_ns_files_altroot(original_datadir):
     db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
-    api = generate_api(original_datadir / 'sub', 'psycopg2', db, file_as_namespace=True, namespace_root='a')
+    api = generate_api(original_datadir / 'sub', 'psycopg2', db, namespace_mode='files', namespace_root='file_a')
 
-    assert api.a() == ('a',)
-    assert api.b.b() == ('b',)
+    assert api.root.func_a() == ('a',)
+    assert api.root.file_b.func_b() == ('b',)
+
+
+def test_generate_ns_flat(original_datadir):
+    db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
+    api = generate_api(original_datadir / 'sub', 'psycopg2', db, namespace_mode='flat')
+
+    assert api.func_a() == ('a',)
+    assert api.func_b() == ('b',)
 
 
 @pytest.fixture()

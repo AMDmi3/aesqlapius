@@ -22,6 +22,7 @@ import functools
 import importlib
 from typing import (
     Any,
+    Literal,
     Optional,
     TypeVar,
     Union,
@@ -36,6 +37,7 @@ __version__ = '0.0.2'
 
 
 T = TypeVar('T')
+NAMESPACE_MODE = Literal['dirs', 'files', 'flat']
 
 
 @overload
@@ -44,8 +46,8 @@ def generate_api(
     driver: str,
     db: Any = None,
     *,
-    file_as_namespace: bool = False,
     extension: str = '.sql',
+    namespace_mode: NAMESPACE_MODE = 'dirs',
     namespace_root: str = '__init__',
 ) -> Namespace:
     ...  # pragma: no cover
@@ -58,8 +60,8 @@ def generate_api(
     db: Any = None,
     *,
     target: T,
-    file_as_namespace: bool = False,
     extension: str = '.sql',
+    namespace_mode: NAMESPACE_MODE = 'dirs',
     namespace_root: str = '__init__',
 ) -> T:
     ...  # pragma: no cover
@@ -71,8 +73,8 @@ def generate_api(
     db: Any = None,
     *,
     target: Optional[T] = None,
-    file_as_namespace: bool = False,
     extension: str = '.sql',
+    namespace_mode: NAMESPACE_MODE = 'dirs',
     namespace_root: str = '__init__',
 ) -> Union[T, Namespace]:
     ns: Union[T, Namespace]
@@ -84,7 +86,9 @@ def generate_api(
     driver_module = importlib.import_module(f'aesqlapius.drivers.{driver}')
 
     for entry, queries in iter_query_dir(path, extension):
-        if file_as_namespace and entry.namespace_path[-1] != namespace_root:
+        if namespace_mode == 'flat':
+            namespace_path = []
+        elif namespace_mode == 'files' and entry.namespace_path[-1] != namespace_root:
             namespace_path = entry.namespace_path
         else:
             namespace_path = entry.namespace_path[:-1]
