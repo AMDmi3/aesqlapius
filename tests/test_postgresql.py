@@ -3,7 +3,7 @@ from typing import Iterator
 
 import pytest
 
-from aesqlapius.apis.psycopg2 import generate_api
+from aesqlapius import generate_api
 
 psycopg2 = pytest.importorskip('psycopg2')
 pytest_datadir = pytest.importorskip('pytest_datadir')
@@ -17,13 +17,13 @@ pytestmark = pytest.mark.skipif(
 
 def test_generate_default(original_datadir):
     db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
-    api = generate_api(original_datadir, db)
+    api = generate_api(original_datadir, 'psycopg2', db)
 
     assert api.ping() == {'pong': True}
 
 
 def test_generate_nobind(original_datadir):
-    api = generate_api(original_datadir)
+    api = generate_api(original_datadir, 'psycopg2')
 
     db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
 
@@ -34,7 +34,7 @@ def test_generate_target(original_datadir):
     class MyDB():
         def __init__(self, dsn: str) -> None:
             self.db = psycopg2.connect(dsn)
-            generate_api(original_datadir, self.db, target=self)
+            generate_api(original_datadir, 'psycopg2', self.db, target=self)
 
     db = MyDB(os.environ.get('POSTGRESQL_DSN'))
 
@@ -43,7 +43,7 @@ def test_generate_target(original_datadir):
 
 def test_generate_ns_default(original_datadir):
     db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
-    api = generate_api(original_datadir / 'sub', db)
+    api = generate_api(original_datadir / 'sub', 'psycopg2', db)
 
     assert api.a() == ('a',)
     assert api.b() == ('b',)
@@ -51,7 +51,7 @@ def test_generate_ns_default(original_datadir):
 
 def test_generate_ns_file(original_datadir):
     db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
-    api = generate_api(original_datadir / 'sub', db, file_as_namespace=True)
+    api = generate_api(original_datadir / 'sub', 'psycopg2', db, file_as_namespace=True)
 
     assert api.a.a() == ('a',)
     assert api.b.b() == ('b',)
@@ -59,7 +59,7 @@ def test_generate_ns_file(original_datadir):
 
 def test_generate_ns_file_altroot(original_datadir):
     db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
-    api = generate_api(original_datadir / 'sub', db, file_as_namespace=True, namespace_root='a')
+    api = generate_api(original_datadir / 'sub', 'psycopg2', db, file_as_namespace=True, namespace_root='a')
 
     assert api.a() == ('a',)
     assert api.b.b() == ('b',)
@@ -68,7 +68,7 @@ def test_generate_ns_file_altroot(original_datadir):
 @pytest.fixture()
 def api(original_datadir):
     db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
-    return generate_api(original_datadir, db)
+    return generate_api(original_datadir, 'psycopg2', db)
 
 
 def test_pass_args(api):

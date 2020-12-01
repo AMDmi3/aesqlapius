@@ -42,10 +42,10 @@ SELECT * FROM cities WHERE name = %(city)s;
 
 script.py:
 ```python
-from aesqlapius.apis.psycopg2 import generate_api
+from aesqlapius import generate_api
 
 db = psycopg2.connect('...')
-api = generate_api('queries.sql', db)
+api = generate_api('queries.sql', 'psycopg2', db)
 
 api.add_city('Moscow', 12500000)
 api.add_city('Paris')
