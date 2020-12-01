@@ -2,6 +2,7 @@ PYTEST?=	pytest
 FLAKE8?=	flake8
 MYPY?=		mypy
 ISORT?=		isort
+PYTHON?=	python3
 
 lint: test flake8 mypy isort-check
 
@@ -19,3 +20,6 @@ isort-check::
 
 isort::
 	${ISORT} ${ISORT_ARGS} aesqlapius/**/*.py tests/*.py
+
+sdist::
+	${PYTHON} setup.py sdist
