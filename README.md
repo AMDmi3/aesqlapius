@@ -115,7 +115,7 @@ db.my_method('arg1', 'arg2')
 | `subdir/foo.sql`     | `-- def b(): ...` | `api.subdir.foo.b()` |
 | `subdir/bar.sql`     | `-- def c(): ...` | `api.subdir.bar.c()` |
 
-In this mode, *namespace_root* allows to specify a special file name which circumvents this behabior, allowing to mimic how Python handles module namespaces. For example, when *namespace_root* = `"__init__"` (the default):
+In this mode, *namespace_root* allows to specify a special file name which circumvents this behavior, allowing to mimic how Python handles module namespaces. For example, when *namespace_root* = `"__init__"` (the default):
 
 | path under query dir  | function          | resulting API        |
 |-----------------------|-------------------|----------------------|
@@ -134,7 +134,7 @@ In this mode, *namespace_root* allows to specify a special file name which circu
 
 ### Query annotations
 
-Each query managed by **aesqlapius** must be preceeded with a `-- ` (SQL comment) followed by a Python-style function definition:
+Each query managed by **aesqlapius** must be preceded with a `-- ` (SQL comment) followed by a Python-style function definition:
 
 ```sql
 -- def function_name(parameters, ...) -> return_type: ...
