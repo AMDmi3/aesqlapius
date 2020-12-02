@@ -174,3 +174,29 @@ def test_get_dict_of_tuples_by_column_index(api):
         1: (1, 'b'),
         2: (2, 'c'),
     }
+
+
+def test_get_dict_of_tuples_by_column_name_removed_key(api):
+    assert api.get.dict_of_tuples_by_column_name_removed_key() == {
+        0: ('a',),
+        1: ('b',),
+        2: ('c',),
+    }
+
+
+def test_get_dict_of_tuples_by_column_index_removed_key(api):
+    assert api.get.dict_of_tuples_by_column_index_removed_key() == {
+        0: ('a',),
+        1: ('b',),
+        2: ('c',),
+    }
+
+
+def test_get_dict_of_tuples_by_column_name_out_of_range(api):
+    with pytest.raises(KeyError):
+        api.get.dict_of_tuples_by_column_name_out_of_range()
+
+
+def test_get_dict_of_tuples_by_column_index_out_of_range(api):
+    with pytest.raises(IndexError):
+        api.get.dict_of_tuples_by_column_index_out_of_range()

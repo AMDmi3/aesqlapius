@@ -127,6 +127,34 @@ def test_returns_outer_dict():
     )
 
 
+def test_returns_outer_dict_remove_key():
+    assert parse_function_definition(
+        'def Foo() -> Dict[-0, Tuple]: ...'
+    ) == FunctionDefinition(
+        name='Foo',
+        args=[],
+        returns=ReturnValueDefinition(
+            outer_format=ReturnValueOuterFormat.DICT,
+            inner_format=ReturnValueInnerFormat.TUPLE,
+            outer_dict_by=0,
+            remove_key_column=True
+        )
+    )
+
+    assert parse_function_definition(
+        'def Foo() -> Dict[-"colname", Tuple]: ...'
+    ) == FunctionDefinition(
+        name='Foo',
+        args=[],
+        returns=ReturnValueDefinition(
+            outer_format=ReturnValueOuterFormat.DICT,
+            inner_format=ReturnValueInnerFormat.TUPLE,
+            outer_dict_by='colname',
+            remove_key_column=True
+        )
+    )
+
+
 def test_returns_inner_tuple():
     assert parse_function_definition(
         'def Foo() -> Single[Tuple]: ...'

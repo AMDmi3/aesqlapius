@@ -76,17 +76,31 @@ def generate_method(query: Query) -> Callable[..., Any]:
             with db.cursor() as cur:
                 cur.execute(query.text, prepare_args_as_dict(func_def, args, kwargs))
                 names = [desc.name for desc in cur.description]
-                process_row = generate_row_processor(returns.inner_format, names)
 
                 if isinstance(returns.outer_dict_by, int):
-                    key_index = returns.outer_dict_by
+                    keyidx = returns.outer_dict_by
                 else:
-                    key_index = names.index(returns.outer_dict_by)
+                    try:
+                        keyidx = names.index(returns.outer_dict_by)
+                    except ValueError:
+                        raise KeyError(f'key column {returns.outer_dict_by} not found')
 
-                return {
-                    row[key_index]: process_row(row)
-                    for row in cur
-                }
+                if keyidx >= len(names):
+                    raise IndexError(f'key column index {keyidx} is out of range')
+
+                if returns.remove_key_column:
+                    trimmed_names = names[0:keyidx] + names[keyidx + 1:]
+                    process_row = generate_row_processor(returns.inner_format, trimmed_names)
+                    return {
+                        row[keyidx]: process_row(row[0:keyidx] + row[keyidx + 1:])
+                        for row in cur
+                    }
+                else:
+                    process_row = generate_row_processor(returns.inner_format, names)
+                    return {
+                        row[keyidx]: process_row(row)
+                        for row in cur
+                    }
 
         return method_returning_dict
 

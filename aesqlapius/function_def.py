@@ -52,6 +52,7 @@ class ReturnValueDefinition:
     outer_format: ReturnValueOuterFormat
     inner_format: Union[ReturnValueInnerFormat, str]
     outer_dict_by: Union[None, str, int] = None
+    remove_key_column: bool = False
 
 
 @dataclass
@@ -79,17 +80,27 @@ def _parse_return_value_outer(node: ast.Subscript) -> ReturnValueDefinition:
     assert isinstance(node.value, ast.Name)
 
     if node.value.id == 'Dict':
+        # requre two args, e.g. Dict[a, b]
         assert isinstance(node.slice, ast.Tuple)
         assert len(node.slice.elts) == 2
-        assert isinstance(node.slice.elts[0], ast.Constant)
 
-        dict_by = node.slice.elts[0].value
-        assert isinstance(dict_by, int) or isinstance(dict_by, str)
+        # handle unary minus for the first arg, e.g. Dict[-a, b]
+        if isinstance(node.slice.elts[0], ast.UnaryOp):
+            assert isinstance(node.slice.elts[0].op, ast.USub)
+            remove_key_column = True
+            dict_by = node.slice.elts[0].operand
+        else:
+            remove_key_column = False
+            dict_by = node.slice.elts[0]
+
+        assert isinstance(dict_by, ast.Constant)
+        assert isinstance(dict_by.value, int) or isinstance(dict_by.value, str)
 
         return ReturnValueDefinition(
             outer_format=ReturnValueOuterFormat.DICT,
             inner_format=_parse_return_value_inner(node.slice.elts[1]),
-            outer_dict_by=dict_by
+            outer_dict_by=dict_by.value,
+            remove_key_column=remove_key_column
         )
 
     if node.value.id == 'List':
