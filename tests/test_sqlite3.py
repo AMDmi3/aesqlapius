@@ -1,4 +1,3 @@
-import os
 from typing import Iterator
 
 import pytest
@@ -11,7 +10,8 @@ pytest_datadir = pytest.importorskip('pytest_datadir')
 
 @pytest.fixture()
 def db(tmp_path):
-    return sqlite3.connect(tmp_path / "db.sqlite")
+    return sqlite3.connect(tmp_path / 'db.sqlite')
+
 
 def test_generate_default(original_datadir, db):
     api = generate_api(original_datadir, 'sqlite3', db)
