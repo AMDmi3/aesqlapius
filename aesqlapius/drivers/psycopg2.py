@@ -70,5 +70,25 @@ def generate_method(query: Query) -> Callable[..., Any]:
 
         return method_returning_single
 
+    elif returns.outer_format == ReturnValueOuterFormat.DICT:
+        def method_returning_dict(db, *args, **kwargs) -> Any:
+            assert(returns is not None)  # mypy bug
+            with db.cursor() as cur:
+                cur.execute(query.text, prepare_args_as_dict(func_def, args, kwargs))
+                names = [desc.name for desc in cur.description]
+                process_row = generate_row_processor(returns.inner_format, names)
+
+                if isinstance(returns.outer_dict_by, int):
+                    key_index = returns.outer_dict_by
+                else:
+                    key_index = names.index(returns.outer_dict_by)
+
+                return {
+                    row[key_index]: process_row(row)
+                    for row in cur
+                }
+
+        return method_returning_dict
+
     else:
         raise NotImplementedError(f"unsupported outer return type format '{returns.outer_format}'")  # pragma: no cover

@@ -148,6 +148,22 @@ def test_get_list_list(api):
     ]
 
 
+def test_get_dict_of_tuples_by_column_name(api):
+    assert api.get.dict_of_tuples_by_column_name() == {
+        0: (0, 'a'),
+        1: (1, 'b'),
+        2: (2, 'c'),
+    }
+
+
+def test_get_dict_of_tuples_by_column_index(api):
+    assert api.get.dict_of_tuples_by_column_index() == {
+        0: (0, 'a'),
+        1: (1, 'b'),
+        2: (2, 'c'),
+    }
+
+
 def test_get_single_tuple(api):
     assert api.get.single_tuple() == (0, 'a')
 

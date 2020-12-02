@@ -27,3 +27,9 @@ SELECT a, chr(ascii('a') + a) AS b FROM generate_series(0, 2) a;
 
 -- def list_tuple() -> List[Tuple]: ...
 SELECT a, chr(ascii('a') + a) AS b FROM generate_series(0, 2) a;
+
+-- def dict_of_tuples_by_column_name() -> Dict['a', Tuple]: ...
+SELECT a, chr(ascii('a') + a) AS b FROM generate_series(0, 2) a;
+
+-- def dict_of_tuples_by_column_index() -> Dict[0, Tuple]: ...
+SELECT a, chr(ascii('a') + a) AS b FROM generate_series(0, 2) a;
