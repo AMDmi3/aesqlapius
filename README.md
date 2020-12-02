@@ -1,7 +1,14 @@
 # aeSQLAPIus
 
+<a href="https://repology.org/project/python:aesqlapius/versions">
+	<img src="https://repology.org/badge/vertical-allrepos/python:aesqlapius.svg" alt="Packaging status">
+</a>
+
 ![CI](https://github.com/AMDmi3/aesqlapius/workflows/CI/badge.svg)
 [![codecov](https://codecov.io/gh/AMDmi3/aesqlapius/branch/master/graph/badge.svg?token=87aZsxlja2)](https://codecov.io/gh/AMDmi3/aesqlapius)
+[![PyPI downloads](https://img.shields.io/pypi/dm/aesqlapius.svg)](https://pypi.org/project/aesqlapius/)
+[![Github commits (since latest release)](https://img.shields.io/github/commits-since/AMDmi3/aesqlapius/latest.svg)](https://github.com/AMDmi3/aesqlapius)
+
 
 ## Summary
 
