@@ -65,5 +65,11 @@ def generate_row_processor(inner_format: Union[ReturnValueInnerFormat, str], fie
 
         return process_row_list
 
+    elif inner_format == ReturnValueInnerFormat.SINGLE:
+        def process_row_single(row: Tuple[Any]) -> Any:
+            return row[0]
+
+        return process_row_single
+
     else:
         raise NotImplementedError(f"unsupported inner return type format '{inner_format}'")  # pragma: no cover

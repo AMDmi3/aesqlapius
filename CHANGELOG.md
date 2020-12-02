@@ -5,6 +5,7 @@
 * Queries may now return *dict* of rows by specified (by either
   name or index) column, with possibility to omit key column from
   the output.
+* Queries may now return single value (scalar) as row type.
 
 ## 0.0.2
 

@@ -194,6 +194,19 @@ def test_returns_inner_list():
     )
 
 
+def test_returns_inner_single():
+    assert parse_function_definition(
+        'def Foo() -> Single[Single]: ...'
+    ) == FunctionDefinition(
+        name='Foo',
+        args=[],
+        returns=ReturnValueDefinition(
+            outer_format=ReturnValueOuterFormat.SINGLE,
+            inner_format=ReturnValueInnerFormat.SINGLE
+        )
+    )
+
+
 def test_returns_inner_custom():
     assert parse_function_definition(
         'def Foo() -> Single[MyType]: ...'
