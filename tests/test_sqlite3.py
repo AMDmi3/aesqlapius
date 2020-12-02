@@ -9,65 +9,61 @@ sqlite3 = pytest.importorskip('sqlite3')
 pytest_datadir = pytest.importorskip('pytest_datadir')
 
 
-def test_generate_default(original_datadir, tmp_path):
-    db = sqlite3.connect(tmp_path / "db.sqlite")
+@pytest.fixture()
+def db(tmp_path):
+    return sqlite3.connect(tmp_path / "db.sqlite")
+
+def test_generate_default(original_datadir, db):
     api = generate_api(original_datadir, 'sqlite3', db)
 
     assert api.ping() == {'pong': True}
 
 
-def test_generate_nobind(original_datadir, tmp_path):
+def test_generate_nobind(original_datadir, db):
     api = generate_api(original_datadir, 'sqlite3')
-
-    db = sqlite3.connect(tmp_path / "db.sqlite")
 
     assert api.ping(db) == {'pong': True}
 
 
-def test_generate_target(original_datadir, tmp_path):
+def test_generate_target(original_datadir, db):
     class MyDB():
-        def __init__(self, dsn: str) -> None:
-            self.db = sqlite3.connect(dsn)
+        def __init__(self) -> None:
+            self.db = db
             generate_api(original_datadir, 'sqlite3', self.db, target=self)
 
-    db = MyDB(os.environ.get('POSTGRESQL_DSN'))
+    mydb = MyDB()
 
-    assert db.ping() == {'pong': True}
+    assert mydb.ping() == {'pong': True}
 
 
-def test_generate_from_file(original_datadir, tmp_path):
-    db = sqlite3.connect(tmp_path / "db.sqlite")
+def test_generate_from_file(original_datadir, db):
     api = generate_api(original_datadir / '__init__.sql', 'sqlite3', db)
 
     assert api.ping() == {'pong': True}
 
 
-def test_generate_ns_dirs(original_datadir, tmp_path):
-    db = sqlite3.connect(tmp_path / "db.sqlite")
+def test_generate_ns_dirs(original_datadir, db):
     api = generate_api(original_datadir / 'sub', 'sqlite3', db, namespace_mode='dirs')
 
     assert api.root.func_a() == ('a',)
     assert api.root.func_b() == ('b',)
 
 
-def test_generate_ns_files(original_datadir, tmp_path):
-    db = sqlite3.connect(tmp_path / "db.sqlite")
+def test_generate_ns_files(original_datadir, db):
     api = generate_api(original_datadir / 'sub', 'sqlite3', db, namespace_mode='files')
 
     assert api.root.file_a.func_a() == ('a',)
     assert api.root.file_b.func_b() == ('b',)
 
 
-def test_generate_ns_files_altroot(original_datadir, tmp_path):
-    db = sqlite3.connect(tmp_path / "db.sqlite")
+def test_generate_ns_files_altroot(original_datadir, db):
     api = generate_api(original_datadir / 'sub', 'sqlite3', db, namespace_mode='files', namespace_root='file_a')
 
     assert api.root.func_a() == ('a',)
     assert api.root.file_b.func_b() == ('b',)
 
 
-def test_generate_ns_flat(original_datadir, tmp_path):
-    db = sqlite3.connect(tmp_path / "db.sqlite")
+def test_generate_ns_flat(original_datadir, db):
     api = generate_api(original_datadir / 'sub', 'sqlite3', db, namespace_mode='flat')
 
     assert api.func_a() == ('a',)
@@ -75,8 +71,7 @@ def test_generate_ns_flat(original_datadir, tmp_path):
 
 
 @pytest.fixture()
-def api(original_datadir, tmp_path):
-    db = sqlite3.connect(tmp_path / "db.sqlite")
+def api(original_datadir, db):
     api = generate_api(original_datadir, 'sqlite3', db)
     api.create_test_table()
     api.fill_test_table()
