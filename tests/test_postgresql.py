@@ -41,6 +41,13 @@ def test_generate_target(original_datadir):
     assert db.ping() == {'pong': True}
 
 
+def test_generate_from_file(original_datadir):
+    db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
+    api = generate_api(original_datadir / '__init__.sql', 'psycopg2', db)
+
+    assert api.ping() == {'pong': True}
+
+
 def test_generate_ns_dirs(original_datadir):
     db = psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
     api = generate_api(original_datadir / 'sub', 'psycopg2', db, namespace_mode='dirs')

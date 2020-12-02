@@ -30,7 +30,7 @@ from typing import (
 )
 
 from aesqlapius.namespace import Namespace, inject_method
-from aesqlapius.querydir import iter_query_dir
+from aesqlapius.querydir import iter_queries
 
 
 __version__ = '0.0.2'
@@ -85,7 +85,7 @@ def generate_api(
 
     driver_module = importlib.import_module(f'aesqlapius.drivers.{driver}')
 
-    for entry, queries in iter_query_dir(path, extension):
+    for entry, queries in iter_queries(path, extension):
         if namespace_mode == 'flat':
             namespace_path = []
         elif namespace_mode == 'files' and entry.namespace_path[-1] != namespace_root:

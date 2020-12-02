@@ -6,6 +6,7 @@
   drivers. Driver is now selected by a string argument.
 * Replace `file_as_namespace` flag with clearer `namespace_mode`
   argument which allows `dirs`, `files` and a new `flat` modes.
+* Allow loading queries from a plain file
 
 ## 0.0.1
 

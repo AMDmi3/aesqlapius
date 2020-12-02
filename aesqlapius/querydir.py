@@ -47,6 +47,13 @@ def _walk_dir_tree(path: str, extension: str, namespace_path: Optional[List[str]
                 )
 
 
-def iter_query_dir(path: str, extension: str) -> Iterator[Tuple[QueryDirEntry, List[Query]]]:
-    for entry in _walk_dir_tree(path, extension):
-        yield (entry, parse_query_file(entry.filesystem_path))
+def iter_queries(path: str, extension: str) -> Iterator[Tuple[QueryDirEntry, List[Query]]]:
+    if os.path.isdir(path):
+        for entry in _walk_dir_tree(path, extension):
+            yield (entry, parse_query_file(entry.filesystem_path))
+    else:
+        entry = QueryDirEntry(
+            [str(os.path.basename(path)).removesuffix(extension)],
+            path
+        )
+        yield (entry, parse_query_file(path))

@@ -11,7 +11,7 @@ write `execute` and `fetchrow`s by hand for each query. With
 **aesqlapius**:
 
 - Store your SQL queries separate from the code, in a dedicated
-  file (TODO) or directory hierarchy
+  file or directory hierarchy
 - Annotate each query with python-like function definition specifying
   input arguments and output types and patterns
 
@@ -68,7 +68,7 @@ assert api.get_city('Berlin') == City('Berlin', 3800000)
 
 TODO
 
-### Query directory organization
+### Query storage organization
 
 TODO
 
