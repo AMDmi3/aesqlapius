@@ -3,6 +3,7 @@
 ## 0.0.4
 
 * Add sqlite3 support
+* Remove stray print in the module
 
 ## 0.0.3
 

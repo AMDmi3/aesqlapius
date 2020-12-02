@@ -25,7 +25,6 @@ from aesqlapius.function_def import ArgumentDefinition, FunctionDefinition
 
 def _iter_args(func_def: FunctionDefinition, args: Tuple[Any, ...], kwargs: Dict[str, Any]) -> Iterator[Tuple[ArgumentDefinition, Any]]:
     for narg, arg in enumerate(func_def.args):
-        print(arg)
         value: Any = None
         if narg < len(args):
             if arg.name in kwargs:
