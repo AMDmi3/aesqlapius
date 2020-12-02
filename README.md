@@ -79,7 +79,7 @@ The module has a single entry point in form of a function:
 def generate_api(path, driver, db=None, *, target=None, extension='.sql', namespace_mode='dirs', namespace_root='__init__')
 ```
 
-This loads SQL queries from *path* (a file or directory) and returns an API class to use with specified database *driver* (currently `psycopg2` is supported).
+This loads SQL queries from *path* (a file or directory) and returns an API class to use with specified database *driver* (`psycopg2`, `sqlite3`).
 
 If *db* is specified, all generated methods are bound to the given database connection object:
 

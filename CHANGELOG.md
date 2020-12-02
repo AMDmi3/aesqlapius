@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.4
+
+* Add sqlite3 support
+
 ## 0.0.3
 
 * Queries may now return *dict* of rows by specified (by either
