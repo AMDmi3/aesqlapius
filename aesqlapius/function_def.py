@@ -37,7 +37,7 @@ class ReturnValueOuterFormat(Enum):
     ITERATOR = 1
     LIST = 2
     SINGLE = 3
-    # DICT = 4  # TODO
+    DICT = 4
 
 
 @unique
@@ -51,6 +51,7 @@ class ReturnValueInnerFormat(Enum):
 class ReturnValueDefinition:
     outer_format: ReturnValueOuterFormat
     inner_format: Union[ReturnValueInnerFormat, str]
+    outer_dict_by: Union[None, str, int] = None
 
 
 @dataclass
@@ -58,6 +59,52 @@ class FunctionDefinition:
     name: str
     args: List[ArgumentDefinition] = field(default_factory=list)
     returns: Optional[ReturnValueDefinition] = None
+
+
+def _parse_return_value_inner(node: ast.AST) -> Union[ReturnValueInnerFormat, str]:
+    # in future, support subscripts with detailed type specifications
+    assert isinstance(node, ast.Name)
+
+    if node.id == 'Tuple':
+        return ReturnValueInnerFormat.TUPLE
+    elif node.id == 'Dict':
+        return ReturnValueInnerFormat.DICT
+    elif node.id == 'List':
+        return ReturnValueInnerFormat.LIST
+    else:  # custom type
+        return node.id
+
+
+def _parse_return_value_outer(node: ast.Subscript) -> ReturnValueDefinition:
+    assert isinstance(node.value, ast.Name)
+
+    if node.value.id == 'Dict':
+        assert isinstance(node.slice, ast.Tuple)
+        assert len(node.slice.elts) == 2
+        assert isinstance(node.slice.elts[0], ast.Constant)
+
+        dict_by = node.slice.elts[0].value
+        assert isinstance(dict_by, int) or isinstance(dict_by, str)
+
+        return ReturnValueDefinition(
+            outer_format=ReturnValueOuterFormat.DICT,
+            inner_format=_parse_return_value_inner(node.slice.elts[1]),
+            outer_dict_by=dict_by
+        )
+
+    if node.value.id == 'List':
+        outer_format = ReturnValueOuterFormat.LIST
+    elif node.value.id == 'Iterator':
+        outer_format = ReturnValueOuterFormat.ITERATOR
+    elif node.value.id == 'Single':
+        outer_format = ReturnValueOuterFormat.SINGLE
+    else:
+        raise TypeError(f'Unexpected return value type {node.value.id}')
+
+    return ReturnValueDefinition(
+        outer_format=outer_format,
+        inner_format=_parse_return_value_inner(node.slice)
+    )
 
 
 def parse_function_definition(source: str) -> FunctionDefinition:
@@ -94,27 +141,8 @@ def parse_function_definition(source: str) -> FunctionDefinition:
     if isinstance(returns, ast.Constant) and returns.value is None:
         func_def.returns = None
     else:
-        assert(isinstance(returns, ast.Subscript))
-
-        if returns.value.id in ('List', 'list'):  # type: ignore
-            outer_format = ReturnValueOuterFormat.LIST
-        elif returns.value.id == 'Iterator':  # type: ignore
-            outer_format = ReturnValueOuterFormat.ITERATOR
-        elif returns.value.id == 'Single':  # type: ignore
-            outer_format = ReturnValueOuterFormat.SINGLE
-        else:
-            raise TypeError(f'Unexpected return value type {returns.value.id}')  # type: ignore
-
-        if returns.slice.id in ('Tuple', 'tuple'):  # type: ignore
-            inner_format = ReturnValueInnerFormat.TUPLE
-        elif returns.slice.id in ('Dict', 'dict'):  # type: ignore
-            inner_format = ReturnValueInnerFormat.DICT
-        elif returns.slice.id in ('List', 'list'):  # type: ignore
-            inner_format = ReturnValueInnerFormat.LIST
-        else:  # custom type
-            inner_format = returns.slice.id  # type: ignore
-
-        func_def.returns = ReturnValueDefinition(outer_format, inner_format)
+        assert isinstance(returns, ast.Subscript)
+        func_def.returns = _parse_return_value_outer(returns)
 
     # check body
     assert(len(func.body) == 1)
