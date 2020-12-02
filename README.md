@@ -26,7 +26,7 @@ write `execute` and `fetchrow`s by hand for each query. With
 queries as plain methods. It handles arguments (pass positional
 or keyword arguments as you like, default values are also handled) and
 output types and patterns (you may specify whether a method returns
-iterator, list, dict (TODO) of rows, or a single row, where row may
+iterator, list, dict of rows, or a single row, where row may
 be represented as a tuple, list, dict, single value or a custom
 type such as a dataclass).
 
