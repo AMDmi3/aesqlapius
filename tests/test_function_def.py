@@ -223,3 +223,14 @@ def test_returns_inner_custom():
 def test_returns_invalid():
     with pytest.raises(TypeError):
         parse_function_definition('def Foo() -> BadType[List]: ...')
+
+
+@pytest.mark.xfail
+def test_accepts_complex_arg_annotations():
+    parse_function_definition('def Foo(arg: Tuple[str, int]) -> None: ...')
+
+
+@pytest.mark.xfail
+def test_accepts_complex_return_annotations():
+    parse_function_definition('def Foo() -> Single[Single[bool]]: ...')
+    parse_function_definition('def Foo() -> Single[Single[Tuple[str, int]]]: ...')
