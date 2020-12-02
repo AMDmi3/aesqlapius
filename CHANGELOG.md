@@ -3,7 +3,8 @@
 ## 0.0.3
 
 * Queries may now return *dict* of rows by specified (by either
-  name or index) column.
+  name or index) column, with possibility to omit key column from
+  the output.
 
 ## 0.0.2
 

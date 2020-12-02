@@ -165,10 +165,10 @@ api.myfunc(1, bar="sometext")  # foo=1, bar="sometext", baz=123
 Return value annotation is required and may either be `None` (when query does not return anything) or a nested type annotation with specific structure `RowsFormat[RowFormat]`.
 
 Outer `RowsFormat` specifies how multiple rows returned by the query are handled. Allowed values are:
-* `Iterator` - return a row iterator.
-* `List` - return a list of rows.
-* `Single` - return a single row.
-* `Dict` - return a dictionary of rows. The column used as dictionary key is specified as the first argument, e.g. `Dict[0, ...]` returns dict by the first column and `Dict['colname', ...] returns dict by the column named *colname*.
+* `Iterator[RowFormat]` - return a row iterator.
+* `List[RowFormat]` - return a list of rows.
+* `Single[RowFormat]` - return a single row.
+* `Dict[KeyColumn, RowFormat]` - return a dictionary of rows. The column to be used as a dictionary key is specified in the first argument, e.g. `Dict[0, ...]` uses first returned column as key and `Dict['colname', ...] uses column named *colname*. Precede column index or name with unary minus to make it removed from the row contents.
 
 Inner `RowFormat` specifies how data for each row is presented:
 * `Tuple` - return row as a tuple of values.
@@ -184,6 +184,10 @@ SELECT 1, 'foo' UNION SELECT 2, 'bar';
 SELECT 1, 'foo';
 -- def example3() -> Iterator[Dict]: ...
 SELECT 1 AS n, 'foo' AS s UNION SELECT 2 AS n, 'bar' AS s;
+-- def example4() -> Dict['key', Dict]: ...
+SELECT 'foo' AS key, 1 AS a, 2 AS b;
+-- def example5() -> Dict[-'key', Dict]: ...
+SELECT 'foo' AS key, 1 AS a, 2 AS b;
 ```
 ```
 >>> api.example1()
@@ -195,6 +199,10 @@ SELECT 1 AS n, 'foo' AS s UNION SELECT 2 AS n, 'bar' AS s;
 {'n': 1, 's': 'foo'}
 >>> next(it)
 {'n': 2, 's': 'bar'}
+>>> api.example4()
+{'foo': {'key': 'foo', 'a': 1, 'b': 2}}
+>>> api.example5()
+{'foo': {'a': 1, 'b': 2}}
 ```
 
 #### Body
