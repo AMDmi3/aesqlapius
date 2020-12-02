@@ -1,7 +1,7 @@
 # aeSQLAPIus
 
 <a href="https://repology.org/project/python:aesqlapius/versions">
-	<img src="https://repology.org/badge/vertical-allrepos/python:aesqlapius.svg" alt="Packaging status">
+	<img src="https://repology.org/badge/vertical-allrepos/python:aesqlapius.svg" alt="Packaging status" align="right">
 </a>
 
 ![CI](https://github.com/AMDmi3/aesqlapius/workflows/CI/badge.svg)
