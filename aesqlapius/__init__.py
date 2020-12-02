@@ -33,7 +33,7 @@ from aesqlapius.namespace import Namespace, inject_method
 from aesqlapius.querydir import iter_queries
 
 
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 
 
 T = TypeVar('T')
