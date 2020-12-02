@@ -72,7 +72,7 @@ The module has a single entry point in form of a function:
 def generate_api(path, driver, db=None, *, target=None, extension='.sql', namespace_mode='dirs', namespace_root='__init__')
 ```
 
-This loads SQL queries from *path* (a file or directory) and generates an API class to use with specified database *driver* (currently `psycopg2` is supported).
+This loads SQL queries from *path* (a file or directory) and returns an API class to use with specified database *driver* (currently `psycopg2` is supported).
 
 If *db* is specified, all generated methods are bound to the given database connection object:
 
@@ -101,36 +101,36 @@ db.my_method('arg1', 'arg2')
 
 * `dirs` (the default), which maps each subdirectory to a nested method namespace ignoring file names:
 
-| path             | function  | resulting API    |
-|------------------|-----------|------------------|
-| `root.sql`       | `def a()` | `api.a()`        |
-| `subdir/foo.sql` | `def b()` | `api.subdir.b()` |
-| `subdir/bar.sql` | `def c()` | `api.subdir.c()` |
+| path under query dir | function definition | resulting API    |
+|----------------------|---------------------|------------------|
+| `root.sql`           | `-- def a(): ...`   | `api.a()`        |
+| `subdir/foo.sql`     | `-- def b(): ...`   | `api.subdir.b()` |
+| `subdir/bar.sql`     | `-- def c(): ...`   | `api.subdir.c()` |
 
 * `files` which uses file names (after stripping the extension) as an extra nesting level:
 
-| path             | function  | resulting API        |
-|------------------|-----------|----------------------|
-| `root.sql`       | `def a()` | `api.root.a()`       |
-| `subdir/foo.sql` | `def b()` | `api.subdir.foo.b()` |
-| `subdir/bar.sql` | `def c()` | `api.subdir.bar.c()` |
+| path under query dir | function          | resulting API        |
+|----------------------|-------------------|----------------------|
+| `root.sql`           | `-- def a(): ...` | `api.root.a()`       |
+| `subdir/foo.sql`     | `-- def b(): ...` | `api.subdir.foo.b()` |
+| `subdir/bar.sql`     | `-- def c(): ...` | `api.subdir.bar.c()` |
 
 In this mode, *namespace_root* allows to specify a special file name which circumvents this behabior, allowing to mimic how Python handles module namespaces. For example, when *namespace_root* = `"__init__"` (the default):
 
-| path                  | function  | resulting API        |
-|-----------------------|-----------|----------------------|
-| `__init__.sql`        | `def a()` | `api.a()`            |
-| `foo.sql`             | `def b()` | `api.foo.b()`        |
-| `subdir/__init__.sql` | `def c()` | `api.subdir.c()`     |
-| `subdir/bar.sql`      | `def d()` | `api.subdir.bar.d()` |
+| path under query dir  | function          | resulting API        |
+|-----------------------|-------------------|----------------------|
+| `__init__.sql`        | `-- def a(): ...` | `api.a()`            |
+| `foo.sql`             | `-- def b(): ...` | `api.foo.b()`        |
+| `subdir/__init__.sql` | `-- def c(): ...` | `api.subdir.c()`     |
+| `subdir/bar.sql`      | `-- def d(): ...` | `api.subdir.bar.d()` |
 
 * `flat` mode which ignores hierarchy:
 
-| path             | function  | resulting API |
-|------------------|-----------|---------------|
-| `root.sql`       | `def a()` | `api.a()`     |
-| `subdir/foo.sql` | `def b()` | `api.b()`     |
-| `subdir/bar.sql` | `def c()` | `api.c()`     |
+| path under query dir | function          | resulting API |
+|----------------------|-------------------|---------------|
+| `root.sql`           | `-- def a(): ...` | `api.a()`     |
+| `subdir/foo.sql`     | `-- def b(): ...` | `api.b()`     |
+| `subdir/bar.sql`     | `-- def c(): ...` | `api.c()`     |
 
 ### Query annotations
 
@@ -141,6 +141,8 @@ Each query managed by **aesqlapius** must be preceeded with a `-- ` (SQL comment
 ...some SQL code...
 ```
 
+#### Parameters
+
 Parameters allow optional literal default values and optional type annotations (which are currently ignored) and may be specified in both positional, keyword or mixed style in the resulting API:
 
 ```sql
@@ -150,6 +152,8 @@ Parameters allow optional literal default values and optional type annotations (
 ```pyton
 api.myfunc(1, bar="sometext")  # foo=1, bar="sometext", baz=123
 ```
+
+#### Return value
 
 Return value annotation is required and may either be `None` (when query does not return anything) or a nested type annotation with specific structure `RowsFormat[RowFormat]`.
 
@@ -184,6 +188,10 @@ SELECT 1 AS n, 'foo' AS s UNION SELECT 2 AS n, 'bar' AS s;
 >>> next(it)
 {'n': 2, 's': 'bar'}
 ```
+
+#### Body
+
+Function body is required to contain a single ellipsis.
 
 ## License
 
