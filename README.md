@@ -168,6 +168,7 @@ Outer `RowsFormat` specifies how multiple rows returned by the query are handled
 * `Iterator` - return a row iterator.
 * `List` - return a list of rows.
 * `Single` - return a single row.
+* `Dict` - return a dictionary of rows. The column used as dictionary key is specified as the first argument, e.g. `Dict[0, ...]` returns dict by the first column and `Dict['colname', ...] returns dict by the column named *colname*.
 
 Inner `RowFormat` specifies how data for each row is presented:
 * `Tuple` - return row as a tuple of values.

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.3
+
+* Queries may now return *dict* of rows by specified (by either
+  name or index) column.
+
 ## 0.0.2
 
 * Added global `generate_api()` entry point for all supported
