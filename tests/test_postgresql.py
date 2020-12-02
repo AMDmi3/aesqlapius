@@ -216,3 +216,10 @@ def test_get_dict_of_tuples_by_column_name_out_of_range(api):
 def test_get_dict_of_tuples_by_column_index_out_of_range(api):
     with pytest.raises(IndexError):
         api.get.dict_of_tuples_by_column_index_out_of_range()
+
+
+def test_get_dict_of_empties(api):
+    assert api.get.dict_of_empty_dicts() == {0: {}, 1: {}, 2: {}}
+    assert api.get.dict_of_empty_lists() == {0: [], 1: [], 2: []}
+    assert api.get.dict_of_empty_tuples() == {0: (), 1: (), 2: ()}
+    assert api.get.dict_of_empty_singles() == {0: None, 1: None, 2: None}

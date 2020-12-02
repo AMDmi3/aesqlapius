@@ -67,7 +67,7 @@ def generate_row_processor(inner_format: Union[ReturnValueInnerFormat, str], fie
 
     elif inner_format == ReturnValueInnerFormat.SINGLE:
         def process_row_single(row: Tuple[Any]) -> Any:
-            return row[0]
+            return row[0] if row else None
 
         return process_row_single
 
