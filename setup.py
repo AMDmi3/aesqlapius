@@ -43,6 +43,6 @@ setup(
         'Programming Language :: SQL',
         'Topic :: Database',
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.9',
     packages=find_packages(),
 )
