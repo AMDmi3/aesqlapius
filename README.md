@@ -43,14 +43,20 @@ INSERT INTO cities VALUES (%(name)s, %(population)s);
 -- (iterator, list, dict, or single instance of tuples, dicts
 -- or simple values)
 
--- def list_cities() -> List[Single]: ...
+-- def list_cities() -> List[Value]: ...
 SELECT name FROM cities ORDER BY name;
 
--- def get_population(city: str) -> Single[Single]: ...
+-- def get_population(city: str) -> Single[Value]: ...
 SELECT population FROM cities WHERE name = %(city)s;
 
--- def get_populations() -> Dict[-'name', Single]: ...
-SELECT name, population FROM cities WHERE population IS NOT NONE;
+-- def get_populations() -> Dict[-'name', Value]: ...
+SELECT name, population
+FROM cities
+WHERE population IS NOT NONE
+ORDER BY name;
+
+-- def iter_cities()() -> Iterator[Tuple] ...
+SELECT * FROM cities ORDER BY name;
 ```
 
 script.py:
@@ -65,10 +71,11 @@ api.add_city('Moscow', 12500000)
 api.add_city('Paris')
 api.add_city(population=3800000, name='Berlin')
 
-# get query results in the convenient format
+# get query results in the desired format
 assert api.list_cities() == ['Berlin', 'Moscow', 'Paris']
 assert api.get_population('Moscow') == 12500000
 assert api.get_populations() == {'Berlin': 3800000, 'Moscow': 12500000}
+assert next(api.iter_cities()) == ('Berlin', 3800000)
 ```
 
 ## Reference
