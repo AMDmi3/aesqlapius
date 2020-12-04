@@ -48,3 +48,4 @@ jobs:
           MYSQL_DSN: database=aesqlapius user=aesqlapius password=aesqlapius host=localhost port=3306
       - name: Push coverage info
         run: codecov
+        if: github.ref == 'refs/heads/master'
