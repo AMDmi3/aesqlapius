@@ -2,9 +2,6 @@ name: CI
 on: [ push, pull_request ]
 jobs:
   build:
-    env:
-      POSTGRESQL_DSN: dbname=aesqlapius_test user=aesqlapius_test password=aesqlapius_test #host=localhost port=5432
-      MYSQL_DSN: database=aesqlapius_test user=aesqlapius_test password=aesqlapius_test #host=localhost port=3306
     runs-on: ubuntu-20.04
     services:
       mysql:
@@ -12,20 +9,19 @@ jobs:
         ports:
           - 3306:3306
         env:
-          MYSQL_USER: aesqlapius_test
-          MYSQL_PASSWORD: aesqlapius_test
-          MYSQL_DATABASE: aesqlapius_test
-          MYSQL_ROOT_PASSWORD: aesqlapius_test
+          MYSQL_USER: aesqlapius
+          MYSQL_PASSWORD: aesqlapius
+          MYSQL_DATABASE: aesqlapius
+          MYSQL_ROOT_PASSWORD: aesqlapius
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
-      postgres:
+      postgresql:
         image: postgres:latest
         ports:
           - 5432:5432
         env:
-          POSTGRES_USER: aesqlapius_test
-          POSTGRES_PASSWORD: aesqlapius_test
+          POSTGRES_USER: aesqlapius
+          POSTGRES_PASSWORD: aesqlapius
         options: --health-cmd pg_isready --health-interval=10s --health-timeout=5s --health-retries=5
-
     steps:
       - uses: actions/checkout@v2
       - name: Setup python
@@ -38,20 +34,6 @@ jobs:
           pip install codecov
           pip install psycopg2
           pip install mysql-connector-python
-#      - name: Prepare PostgreSQL database
-#        run: |
-#          sudo sed -i -e 's|peer|trust|' /etc/postgresql/*/main/pg_hba.conf
-#          sudo service postgresql start
-#          sudo -u postgres psql -c "CREATE DATABASE aesqlapius_test"
-#          sudo -u postgres psql -c "CREATE USER aesqlapius_test WITH PASSWORD 'aesqlapius_test'"
-#          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE aesqlapius_test TO aesqlapius_test"
-#      - name: Prepare MySQL database
-#        run: |
-#          sudo service mysql start
-#          sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
-#          sudo mysql -e "CREATE DATABASE aesqlapius_test"
-#          sudo mysql -e "CREATE USER aesqlapius_test IDENTIFIED BY 'aesqlapius_test'"
-#          sudo mysql -e "GRANT ALL PRIVILEGES ON aesqlapius_test.* TO 'aesqlapius_test'"
       - name: Run flake8
         run: make flake8
       - name: Run mypy
@@ -62,5 +44,7 @@ jobs:
         run: make test
         env:
           PYTEST_ARGS: --cov-report=xml --cov=aesqlapius
+          POSTGRESQL_DSN: dbname=aesqlapius user=aesqlapius password=aesqlapius host=localhost port=5432
+          MYSQL_DSN: database=aesqlapius user=aesqlapius password=aesqlapius host=localhost port=3306
       - name: Push coverage info
         run: codecov
