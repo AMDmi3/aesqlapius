@@ -100,10 +100,6 @@ def test_get_single_dict(api):
     assert api.get.single_dict() == {'a': 0, 'b': 'a'}
 
 
-def test_get_single_list(api):
-    assert api.get.single_list() == [0, 'a']
-
-
 def test_get_single_single(api):
     assert api.get.single_single() == 0
 
@@ -122,14 +118,6 @@ def test_get_iterator_dict(api):
     assert(next(it) == {'a': 0, 'b': 'a'})
     assert(next(it) == {'a': 1, 'b': 'b'})
     assert(next(it) == {'a': 2, 'b': 'c'})
-
-
-def test_get_iterator_list(api):
-    it = api.get.iterator_list()
-    assert(isinstance(it, Iterator))
-    assert(next(it) == [0, 'a'])
-    assert(next(it) == [1, 'b'])
-    assert(next(it) == [2, 'c'])
 
 
 def test_get_iterator_single(api):
@@ -153,14 +141,6 @@ def test_get_list_dict(api):
         {'a': 0, 'b': 'a'},
         {'a': 1, 'b': 'b'},
         {'a': 2, 'b': 'c'},
-    ]
-
-
-def test_get_list_list(api):
-    assert api.get.list_list() == [
-        [0, 'a'],
-        [1, 'b'],
-        [2, 'c'],
     ]
 
 
@@ -212,6 +192,5 @@ def test_get_dict_of_tuples_by_column_index_out_of_range(api):
 
 def test_get_dict_of_empties(api):
     assert api.get.dict_of_empty_dicts() == {0: {}, 1: {}, 2: {}}
-    assert api.get.dict_of_empty_lists() == {0: [], 1: [], 2: []}
     assert api.get.dict_of_empty_tuples() == {0: (), 1: (), 2: ()}
     assert api.get.dict_of_empty_singles() == {0: None, 1: None, 2: None}
