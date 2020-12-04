@@ -33,8 +33,15 @@ type such as a dataclass).
 
 queries.sql:
 ```sql
--- def add_city(name, population = None) -> None: ...
+-- specify arguments to queries in python format, including
+-- type annotations and support for default values
+
+-- def add_city(name: str, population: int = None) -> None: ...
 INSERT INTO cities VALUES (%(name)s, %(population)s);
+
+-- specify return value format out of wide range of formats
+-- (iterator, list, dict, or single instance of tuples, dicts
+-- or simple values)
 
 -- def list_cities() -> List[Single]: ...
 SELECT name FROM cities ORDER BY name;
@@ -42,8 +49,8 @@ SELECT name FROM cities ORDER BY name;
 -- def get_population(city: str) -> Single[Single]: ...
 SELECT population FROM cities WHERE name = %(city)s;
 
--- def get_city(city: str) -> Single[City]: ...
-SELECT * FROM cities WHERE name = %(city)s;
+-- def get_populations() -> Dict[-'name', Single]: ...
+SELECT name, population FROM cities WHERE population IS NOT NONE;
 ```
 
 script.py:
@@ -53,19 +60,15 @@ from aesqlapius import generate_api
 db = psycopg2.connect('...')
 api = generate_api('queries.sql', 'psycopg2', db)
 
+# pass arguments to queries in either positional and kw form
 api.add_city('Moscow', 12500000)
 api.add_city('Paris')
-api.add_city(population=380000, name='Berlin')
+api.add_city(population=3800000, name='Berlin')
 
+# get query results in the convenient format
 assert api.list_cities() == ['Berlin', 'Moscow', 'Paris']
 assert api.get_population('Moscow') == 12500000
-
-@dataclass
-class City:
-    name: str
-    population: Optional[int]
-
-assert api.get_city('Berlin') == City('Berlin', 3800000)
+assert api.get_populations() == {'Berlin': 3800000, 'Moscow': 12500000}
 ```
 
 ## Reference
@@ -171,9 +174,7 @@ Outer `RowsFormat` specifies how multiple rows returned by the query are handled
 
 Inner `RowFormat` specifies how data for each row is presented:
 * `Tuple` - return row as a tuple of values.
-* `List` - return row as a list of values.
 * `Dict` - return row as a dict, where keys are set to the column names returned by the query.
-* arbitrary type - TODO
 
 Examples:
 ```sql

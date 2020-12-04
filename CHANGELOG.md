@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.5
+
+* Removed `List` row type support
+
 ## 0.0.4
 
 * Add sqlite3 support
