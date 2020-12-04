@@ -9,7 +9,6 @@
 [![PyPI downloads](https://img.shields.io/pypi/dm/aesqlapius.svg)](https://pypi.org/project/aesqlapius/)
 [![Github commits (since latest release)](https://img.shields.io/github/commits-since/AMDmi3/aesqlapius/latest.svg)](https://github.com/AMDmi3/aesqlapius)
 
-
 ## Summary
 
 So you don't want to use ORM, and want to organize your SQL queries
