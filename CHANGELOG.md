@@ -3,6 +3,7 @@
 ## 0.0.5
 
 * Removed `List` row type support
+* Named `Single` row format into `Value` for better readability
 
 ## 0.0.4
 
@@ -11,7 +12,7 @@
 
 ## 0.0.3
 
-* Queries may now return *dict* of rows by specified (by either
+* Queries may now return `Dict` of rows by specified (by either
   name or index) column, with possibility to omit key column from
   the output.
 * Queries may now return single value (scalar) as row type.

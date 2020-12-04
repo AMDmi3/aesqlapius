@@ -104,8 +104,8 @@ def test_get_single_dict(api):
     assert api.get.single_dict() == {'a': 0, 'b': 'a'}
 
 
-def test_get_single_single(api):
-    assert api.get.single_single() == 0
+def test_get_single_value(api):
+    assert api.get.single_value() == 0
 
 
 def test_get_iterator_tuple(api):
@@ -124,8 +124,8 @@ def test_get_iterator_dict(api):
     assert(next(it) == {'a': 2, 'b': 'c'})
 
 
-def test_get_iterator_single(api):
-    it = api.get.iterator_single()
+def test_get_iterator_value(api):
+    it = api.get.iterator_value()
     assert(isinstance(it, Iterator))
     assert(next(it) == 0)
     assert(next(it) == 1)
@@ -148,8 +148,8 @@ def test_get_list_dict(api):
     ]
 
 
-def test_get_list_single(api):
-    assert api.get.list_single() == [0, 1, 2]
+def test_get_list_value(api):
+    assert api.get.list_value() == [0, 1, 2]
 
 
 def test_get_dict_of_tuples_by_column_name(api):

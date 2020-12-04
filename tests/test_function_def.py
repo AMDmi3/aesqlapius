@@ -181,15 +181,15 @@ def test_returns_inner_dict():
     )
 
 
-def test_returns_inner_single():
+def test_returns_inner_value():
     assert parse_function_definition(
-        'def Foo() -> Single[Single]: ...'
+        'def Foo() -> Single[Value]: ...'
     ) == FunctionDefinition(
         name='Foo',
         args=[],
         returns=ReturnValueDefinition(
             outer_format=ReturnValueOuterFormat.SINGLE,
-            inner_format=ReturnValueInnerFormat.SINGLE
+            inner_format=ReturnValueInnerFormat.VALUE
         )
     )
 

@@ -43,7 +43,7 @@ def generate_row_processor(inner_format: Union[ReturnValueInnerFormat, str], fie
             else:
                 raise NameError(f"name '{inner_format}' is not defined")
 
-            return custom_format(**dict(zip(field_names, list(row))))
+            return custom_format(**dict(zip(field_names, row)))
 
         return process_row_custom
 
@@ -59,7 +59,7 @@ def generate_row_processor(inner_format: Union[ReturnValueInnerFormat, str], fie
 
         return process_row_dict
 
-    elif inner_format == ReturnValueInnerFormat.SINGLE:
+    elif inner_format == ReturnValueInnerFormat.VALUE:
         def process_row_single(row: Tuple[Any]) -> Any:
             return row[0] if row else None
 

@@ -182,13 +182,14 @@ Outer `RowsFormat` specifies how multiple rows returned by the query are handled
 Inner `RowFormat` specifies how data for each row is presented:
 * `Tuple` - return row as a tuple of values.
 * `Dict` - return row as a dict, where keys are set to the column names returned by the query.
+* `Value` - return single value from the row. If the query returns multiple fields, the first one is returned.
 
 Examples:
 ```sql
 -- def example1() -> List[Tuple]: ...
 SELECT 1, 'foo' UNION SELECT 2, 'bar';
--- def example2() -> Single[Tuple]: ...
-SELECT 1, 'foo';
+-- def example2() -> Single[Value]: ...
+SELECT 2*2;
 -- def example3() -> Iterator[Dict]: ...
 SELECT 1 AS n, 'foo' AS s UNION SELECT 2 AS n, 'bar' AS s;
 -- def example4() -> Dict['key', Dict]: ...
@@ -200,7 +201,7 @@ SELECT 'foo' AS key, 1 AS a, 2 AS b;
 >>> api.example1()
 [(1, 'foo'), (2, 'bar')]
 >>> api.example2()
-(1, 'foo')
+4
 >>> it = api.example3()
 >>> next(it)
 {'n': 1, 's': 'foo'}

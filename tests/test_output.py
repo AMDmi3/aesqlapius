@@ -28,6 +28,12 @@ def test_dict(row, field_names):
     assert rp(row) == {'a': 1, 'b': 2, 'c': 3}
 
 
+def test_value(row, field_names):
+    rp = generate_row_processor(ReturnValueInnerFormat.VALUE, field_names)
+
+    assert rp(row) == 1
+
+
 def test_custom_local(row, field_names):
     @dataclass
     class MyLocalType:

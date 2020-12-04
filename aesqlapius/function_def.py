@@ -44,7 +44,7 @@ class ReturnValueOuterFormat(Enum):
 class ReturnValueInnerFormat(Enum):
     TUPLE = 1
     DICT = 2
-    SINGLE = 3
+    VALUE = 3
 
 
 @dataclass
@@ -70,8 +70,8 @@ def _parse_return_value_inner(node: ast.AST) -> Union[ReturnValueInnerFormat, st
         return ReturnValueInnerFormat.TUPLE
     elif node.id == 'Dict':
         return ReturnValueInnerFormat.DICT
-    elif node.id == 'Single':
-        return ReturnValueInnerFormat.SINGLE
+    elif node.id == 'Value':
+        return ReturnValueInnerFormat.VALUE
     else:  # custom type
         return node.id
 
