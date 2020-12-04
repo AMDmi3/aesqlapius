@@ -4,7 +4,6 @@ flake8-import-order
 flake8-quotes
 isort
 mypy
-psycopg2
 pytest
 pytest-cov
 pytest-datadir
