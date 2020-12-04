@@ -4,6 +4,7 @@
 
 * Removed `List` row type support
 * Named `Single` row format into `Value` for better readability
+* Added mysql support
 
 ## 0.0.4
 
