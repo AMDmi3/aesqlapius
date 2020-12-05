@@ -42,7 +42,7 @@ def generate_method(query: Query) -> Callable[..., Any]:
             assert(returns is not None)  # mypy bug
             with db.cursor() as cur:
                 cur.execute(query.text, prepare_args_as_dict(func_def, args, kwargs))
-                names = [desc.name for desc in cur.description]
+                names = [desc[0] for desc in cur.description]
                 process_row = generate_row_processor(returns.inner_format, names)
                 yield from map(process_row, cur)
 
@@ -53,7 +53,7 @@ def generate_method(query: Query) -> Callable[..., Any]:
             assert(returns is not None)  # mypy bug
             with db.cursor() as cur:
                 cur.execute(query.text, prepare_args_as_dict(func_def, args, kwargs))
-                names = [desc.name for desc in cur.description]
+                names = [desc[0] for desc in cur.description]
                 process_row = generate_row_processor(returns.inner_format, names)
                 return [process_row(row) for row in cur]
 
@@ -64,7 +64,7 @@ def generate_method(query: Query) -> Callable[..., Any]:
             assert(returns is not None)  # mypy bug
             with db.cursor() as cur:
                 cur.execute(query.text, prepare_args_as_dict(func_def, args, kwargs))
-                names = [desc.name for desc in cur.description]
+                names = [desc[0] for desc in cur.description]
                 process_row = generate_row_processor(returns.inner_format, names)
                 return process_row(cur.fetchone())
 
@@ -75,7 +75,7 @@ def generate_method(query: Query) -> Callable[..., Any]:
             assert(returns is not None)  # mypy bug
             with db.cursor() as cur:
                 cur.execute(query.text, prepare_args_as_dict(func_def, args, kwargs))
-                names = [desc.name for desc in cur.description]
+                names = [desc[0] for desc in cur.description]
 
                 if isinstance(returns.outer_dict_by, int):
                     keyidx = returns.outer_dict_by
