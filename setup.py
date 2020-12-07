@@ -45,4 +45,5 @@ setup(
     ],
     python_requires='>=3.9',
     packages=['aesqlapius', 'aesqlapius.drivers'],
+    package_data={'aesqlapius': ['py.typed']},
 )
