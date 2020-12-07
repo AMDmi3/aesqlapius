@@ -18,11 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from typing import Any, Callable, List
+from typing import Any, Callable, List, TYPE_CHECKING
 
 
 class Namespace:
-    pass
+    if TYPE_CHECKING:
+        def __getattr__(self, name: str) -> Any:
+            pass
 
 
 def inject_method(root: Any, namespace_path: List[str], method: Callable[..., Any]) -> None:
