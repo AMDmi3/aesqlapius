@@ -34,6 +34,8 @@ from aesqlapius.namespace import inject_method
 from aesqlapius.querydir import iter_queries
 
 
+__all__ = ['Namespace', 'generate_api']
+
 __version__ = '0.0.6'
 
 
