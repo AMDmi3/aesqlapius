@@ -44,5 +44,5 @@ setup(
         'Topic :: Database',
     ],
     python_requires='>=3.9',
-    packages=find_packages(),
+    packages=['aesqlapius', 'aesqlapius.drivers'],
 )
