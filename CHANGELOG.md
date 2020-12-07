@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.6
+
+* Packaging fixes: add `py.typed`, don't install tests
+
 ## 0.0.5
 
 * Removed `List` row type support
