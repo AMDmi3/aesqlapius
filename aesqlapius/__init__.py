@@ -29,7 +29,8 @@ from typing import (
     overload
 )
 
-from aesqlapius.namespace import Namespace, inject_method
+from aesqlapius.namespace import Namespace as Namespace
+from aesqlapius.namespace import inject_method
 from aesqlapius.querydir import iter_queries
 
 
