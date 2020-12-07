@@ -2,7 +2,9 @@
 
 ## 0.0.6
 
-* Packaging fixes: add `py.typed`, don't install tests
+* Fix packaging: do not install tests
+* Enable typing properly by addin `py.typed`
+* Disable type checking for generated classes
 
 ## 0.0.5
 
