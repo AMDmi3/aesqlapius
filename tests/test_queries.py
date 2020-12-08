@@ -1,105 +1,149 @@
 import os
-from typing import Iterator
+import re
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Iterator
 
 import pytest
 
 from aesqlapius import generate_api
 
-mysql_connector = pytest.importorskip('mysql.connector')
-pytest_datadir = pytest.importorskip('pytest_datadir')
+
+@dataclass
+class DBEnv:
+    driver: str
+    db: Any
+    hook: Any = None
 
 
-pytestmark = pytest.mark.skipif(
-    not os.environ.get('MYSQL_DSN'),
-    reason='no MYSQL_DSN defined, skipping MySQL tests'
-)
+@pytest.fixture(params=['psycopg2', 'sqlite3', 'mysql'])
+def dbenv(request, tmp_path):
+    if request.param == 'psycopg2':
+        try:
+            import psycopg2
+        except ImportError:
+            pytest.skip('Cannot import psycopg2, skipping related tests', allow_module_level=True)
+
+        if not os.environ.get('POSTGRESQL_DSN'):
+            pytest.skip('No POSTGRESQL_DSN envvar defined, skipping postgresql related tests', allow_module_level=True)
+
+        return DBEnv(
+            request.param,
+            psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
+        )
+
+    elif request.param == 'mysql':
+        try:
+            import mysql.connector
+        except ImportError:
+            pytest.skip('Cannot import mysql.connector, skipping related tests', allow_module_level=True)
+
+        if not os.environ.get('MYSQL_DSN'):
+            pytest.skip('No MYSQL_DSN envvar defined, skipping mysql related tests', allow_module_level=True)
+
+        return DBEnv(
+            request.param,
+            mysql.connector.connect(**{
+                k: v
+                for k, v in map(
+                    lambda s: s.split('=', 1),
+                    os.environ.get('MYSQL_DSN').split()
+                )
+            })
+        )
+
+    elif request.param == 'sqlite3':
+        try:
+            import sqlite3
+        except ImportError:
+            pytest.skip('Cannot import sqlite3, skipping related tests', allow_module_level=True)
+
+        def convert_query_to_sqlite(text, kwargs):
+            return re.sub(r'%\(([^()]+)\)s', r':\1', text)
+
+        return DBEnv(
+            request.param,
+            sqlite3.connect(tmp_path / 'db.sqlite'),
+            convert_query_to_sqlite
+        )
+
+    else:
+        assert(False)
 
 
 @pytest.fixture
-def db():
-    args = {
-        k: v
-        for k, v in map(
-            lambda s: s.split('=', 1),
-            os.environ.get('MYSQL_DSN').split()
-        )
-    }
-    return mysql_connector.connect(**args)
+def queries_dir():
+    return Path(os.path.dirname(__file__)) / 'queries'
 
 
-def test_generate_default(original_datadir, db):
-    api = generate_api(original_datadir, 'mysql', db)
+def test_generate_default(queries_dir, dbenv):
+    api = generate_api(queries_dir / 'ping.sql', dbenv.driver, dbenv.db)
 
     assert api.ping() == {'pong': True}
 
 
-def test_generate_nobind(original_datadir, db):
-    api = generate_api(original_datadir, 'mysql')
+def test_generate_nobind(queries_dir, dbenv):
+    api = generate_api(queries_dir / 'ping.sql', dbenv.driver, dbenv.db)
 
-    assert api.ping(db) == {'pong': True}
+    assert api.ping(dbenv.db) == {'pong': True}
 
 
-def test_generate_target(original_datadir, db):
+def test_generate_target(queries_dir, dbenv):
     class MyDB():
         def __init__(self) -> None:
-            self.db = db
-            generate_api(original_datadir, 'mysql', self.db, target=self)
+            self.db = dbenv.db
+            generate_api(queries_dir / 'ping.sql', dbenv.driver, self.db, target=self)
 
     mydb = MyDB()
 
     assert mydb.ping() == {'pong': True}
 
 
-def test_generate_from_file(original_datadir, db):
-    api = generate_api(original_datadir / '__init__.sql', 'mysql', db)
-
-    assert api.ping() == {'pong': True}
-
-
-def test_generate_ns_dirs(original_datadir, db):
-    api = generate_api(original_datadir / 'sub', 'mysql', db, namespace_mode='dirs')
+def test_generate_ns_dirs(queries_dir, dbenv):
+    api = generate_api(queries_dir / 'namespace', dbenv.driver, dbenv.db, namespace_mode='dirs')
 
     assert api.root.func_a() == ('a',)
     assert api.root.func_b() == ('b',)
 
 
-def test_generate_ns_files(original_datadir, db):
-    api = generate_api(original_datadir / 'sub', 'mysql', db, namespace_mode='files')
+def test_generate_ns_files(queries_dir, dbenv):
+    api = generate_api(queries_dir / 'namespace', dbenv.driver, dbenv.db, namespace_mode='files')
 
     assert api.root.file_a.func_a() == ('a',)
     assert api.root.file_b.func_b() == ('b',)
 
 
-def test_generate_ns_files_altroot(original_datadir, db):
-    api = generate_api(original_datadir / 'sub', 'mysql', db, namespace_mode='files', namespace_root='file_a')
+def test_generate_ns_files_altroot(queries_dir, dbenv):
+    api = generate_api(queries_dir / 'namespace', dbenv.driver, dbenv.db, namespace_mode='files', namespace_root='file_a')
 
     assert api.root.func_a() == ('a',)
     assert api.root.file_b.func_b() == ('b',)
 
 
-def test_generate_ns_flat(original_datadir, db):
-    api = generate_api(original_datadir / 'sub', 'mysql', db, namespace_mode='flat')
+def test_generate_ns_flat(queries_dir, dbenv):
+    api = generate_api(queries_dir / 'namespace', dbenv.driver, dbenv.db, namespace_mode='flat')
 
     assert api.func_a() == ('a',)
     assert api.func_b() == ('b',)
 
 
-def test_query_hook(original_datadir, db):
+def test_query_hook(queries_dir, dbenv):
     def hook(text, kwargs):
         return text.replace('TRUE', 'FALSE')
 
-    api = generate_api(original_datadir, 'mysql', db, hook=hook)
+    api = generate_api(queries_dir / 'ping.sql', dbenv.driver, dbenv.db, hook=hook)
 
-    assert api.ping() == {'pong': False}
+    assert api.ping() == {'pong': False}  # pong value was replaced to False
 
 
 @pytest.fixture()
-def api(original_datadir, db):
-    api = generate_api(original_datadir, 'mysql', db)
+def api(queries_dir, dbenv):
+    api = generate_api(queries_dir / 'api', dbenv.driver, dbenv.db, hook=dbenv.hook)
     api.cleanup_test_table()
     api.create_test_table()
     api.fill_test_table()
-    return api
+    yield api
+    api.cleanup_test_table()
 
 
 def test_pass_args(api):

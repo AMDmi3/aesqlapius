@@ -1,5 +1,5 @@
 -- def nothing() -> None: ...
-SELECT;
+SELECT NULL;
 
 -- def single_dict() -> Single[Dict]: ...
 SELECT 0 AS a, 'a' AS b;
@@ -11,46 +11,46 @@ SELECT 0 AS a, 'a' AS b;
 SELECT 0 AS a;
 
 -- def iterator_dict() -> Iterator[Dict]: ...
-SELECT a, chr(ascii('a') + a) AS b FROM generate_series(0, 2) a;
+SELECT a, b FROM numbers;
 
 -- def iterator_tuple() -> Iterator[Tuple]: ...
-SELECT a, chr(ascii('a') + a) AS b FROM generate_series(0, 2) a;
+SELECT a, b FROM numbers;
 
 -- def iterator_value() -> Iterator[Value]: ...
-SELECT a FROM generate_series(0, 2) a;
+SELECT a FROM numbers;
 
 -- def list_dict() -> List[Dict]: ...
-SELECT a, chr(ascii('a') + a) AS b FROM generate_series(0, 2) a;
+SELECT a, b FROM numbers;
 
 -- def list_tuple() -> List[Tuple]: ...
-SELECT a, chr(ascii('a') + a) AS b FROM generate_series(0, 2) a;
+SELECT a, b FROM numbers;
 
 -- def list_value() -> List[Value]: ...
-SELECT a, chr(ascii('a') + a) AS b FROM generate_series(0, 2) a;
+SELECT a, b FROM numbers;
 
 -- def dict_of_tuples_by_column_name() -> Dict['a', Tuple]: ...
-SELECT a, chr(ascii('a') + a) AS b FROM generate_series(0, 2) a;
+SELECT a, b FROM numbers;
 
 -- def dict_of_tuples_by_column_index() -> Dict[0, Tuple]: ...
-SELECT a, chr(ascii('a') + a) AS b FROM generate_series(0, 2) a;
+SELECT a, b FROM numbers;
 
 -- def dict_of_tuples_by_column_name_removed_key() -> Dict[-'a', Tuple]: ...
-SELECT a, chr(ascii('a') + a) AS b FROM generate_series(0, 2) a;
+SELECT a, b FROM numbers;
 
 -- def dict_of_tuples_by_column_index_removed_key() -> Dict[-0, Tuple]: ...
-SELECT a, chr(ascii('a') + a) AS b FROM generate_series(0, 2) a;
+SELECT a, b FROM numbers;
 
 -- def dict_of_tuples_by_column_name_out_of_range() -> Dict['z', Tuple]: ...
-SELECT a, chr(ascii('a') + a) AS b FROM generate_series(0, 2) a;
+SELECT a, b FROM numbers;
 
 -- def dict_of_tuples_by_column_index_out_of_range() -> Dict[3, Tuple]: ...
-SELECT a, chr(ascii('a') + a) AS b FROM generate_series(0, 2) a;
+SELECT a, b FROM numbers;
 
 -- def dict_of_empty_dicts() -> Dict[-0, Dict]: ...
-SELECT a FROM generate_series(0, 2) a;
+SELECT a FROM numbers;
 
 -- def dict_of_empty_tuples() -> Dict[-0, Tuple]: ...
-SELECT a FROM generate_series(0, 2) a;
+SELECT a FROM numbers;
 
 -- def dict_of_empty_singles() -> Dict[-0, Value]: ...
-SELECT a FROM generate_series(0, 2) a;
+SELECT a FROM numbers;

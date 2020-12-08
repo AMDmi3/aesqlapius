@@ -1,6 +1,3 @@
--- def ping() -> Single[Dict]: ...
-SELECT TRUE AS pong;
-
 -- def swap_args(a: int = 0, b: str = 'a') -> Single[Tuple]: ...
 SELECT %(b)s AS a, %(a)s AS b;
 
@@ -8,7 +5,7 @@ SELECT %(b)s AS a, %(a)s AS b;
 DROP TABLE IF EXISTS numbers;
 
 -- def create_test_table() -> None: ...
-CREATE TABLE numbers (a integer);
+CREATE TABLE numbers (a integer, b text);
 
 -- def fill_test_table() -> None: ...
-INSERT INTO numbers VALUES (0), (1), (2);
+INSERT INTO numbers VALUES (0, 'a'), (1, 'b'), (2, 'c');
