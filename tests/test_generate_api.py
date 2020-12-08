@@ -10,7 +10,7 @@ def test_default(queries_dir, dbenv):
 
 
 def test_nobind(queries_dir, dbenv):
-    api = generate_api(queries_dir / 'ping.sql', dbenv.driver, dbenv.db)
+    api = generate_api(queries_dir / 'ping.sql', dbenv.driver)
 
     assert api.ping(dbenv.db) == {'pong': True}
 
