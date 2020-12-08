@@ -70,6 +70,15 @@ def test_generate_ns_flat(original_datadir, db):
     assert api.func_b() == ('b',)
 
 
+def test_query_hook(original_datadir, db):
+    def hook(text, kwargs):
+        return text.replace('TRUE', 'FALSE')
+
+    api = generate_api(original_datadir, 'sqlite3', db, hook=hook)
+
+    assert api.ping() == {'pong': False}
+
+
 @pytest.fixture()
 def api(original_datadir, db):
     api = generate_api(original_datadir, 'sqlite3', db)
