@@ -22,18 +22,20 @@ from typing import Any, Callable, Iterator, List
 
 from aesqlapius.args import prepare_args_as_dict
 from aesqlapius.function_def import ReturnValueOuterFormat
+from aesqlapius.hook import QueryHook
 from aesqlapius.output import generate_row_processor
 from aesqlapius.query import Query
 
 
-def generate_method(query: Query) -> Callable[..., Any]:
+def generate_method(query: Query, hook: QueryHook) -> Callable[..., Any]:
     func_def = query.func_def
     returns = func_def.returns
 
     if returns is None:
         def method_returning_none(db, *args, **kwargs) -> None:
             with db.cursor(buffered=True) as cur:
-                cur.execute(query.text, prepare_args_as_dict(func_def, args, kwargs))
+                prepared_args = prepare_args_as_dict(func_def, args, kwargs)
+                cur.execute(hook(query.text, prepared_args), prepared_args)
 
         return method_returning_none
 
@@ -41,7 +43,8 @@ def generate_method(query: Query) -> Callable[..., Any]:
         def method_returning_iterator(db, *args, **kwargs) -> Iterator[Any]:
             assert(returns is not None)  # mypy bug
             with db.cursor(buffered=True) as cur:
-                cur.execute(query.text, prepare_args_as_dict(func_def, args, kwargs))
+                prepared_args = prepare_args_as_dict(func_def, args, kwargs)
+                cur.execute(hook(query.text, prepared_args), prepared_args)
                 names = [desc[0] for desc in cur.description]
                 process_row = generate_row_processor(returns.inner_format, names)
                 yield from map(process_row, cur)
@@ -52,7 +55,8 @@ def generate_method(query: Query) -> Callable[..., Any]:
         def method_returning_list(db, *args, **kwargs) -> List[Any]:
             assert(returns is not None)  # mypy bug
             with db.cursor(buffered=True) as cur:
-                cur.execute(query.text, prepare_args_as_dict(func_def, args, kwargs))
+                prepared_args = prepare_args_as_dict(func_def, args, kwargs)
+                cur.execute(hook(query.text, prepared_args), prepared_args)
                 names = [desc[0] for desc in cur.description]
                 process_row = generate_row_processor(returns.inner_format, names)
                 return [process_row(row) for row in cur]
@@ -63,7 +67,8 @@ def generate_method(query: Query) -> Callable[..., Any]:
         def method_returning_single(db, *args, **kwargs) -> Any:
             assert(returns is not None)  # mypy bug
             with db.cursor(buffered=True) as cur:
-                cur.execute(query.text, prepare_args_as_dict(func_def, args, kwargs))
+                prepared_args = prepare_args_as_dict(func_def, args, kwargs)
+                cur.execute(hook(query.text, prepared_args), prepared_args)
                 names = [desc[0] for desc in cur.description]
                 process_row = generate_row_processor(returns.inner_format, names)
                 return process_row(cur.fetchone())
@@ -74,7 +79,8 @@ def generate_method(query: Query) -> Callable[..., Any]:
         def method_returning_dict(db, *args, **kwargs) -> Any:
             assert(returns is not None)  # mypy bug
             with db.cursor(buffered=True) as cur:
-                cur.execute(query.text, prepare_args_as_dict(func_def, args, kwargs))
+                prepared_args = prepare_args_as_dict(func_def, args, kwargs)
+                cur.execute(hook(query.text, prepared_args), prepared_args)
                 names = [desc[0] for desc in cur.description]
 
                 if isinstance(returns.outer_dict_by, int):

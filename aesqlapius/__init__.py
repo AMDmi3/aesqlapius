@@ -29,6 +29,7 @@ from typing import (
     overload
 )
 
+from aesqlapius.hook import QueryHook, default_query_hook
 from aesqlapius.namespace import Namespace as Namespace
 from aesqlapius.namespace import inject_method
 from aesqlapius.querydir import iter_queries
@@ -52,6 +53,7 @@ def generate_api(
     extension: str = '.sql',
     namespace_mode: NAMESPACE_MODE = 'dirs',
     namespace_root: str = '__init__',
+    hook: Optional[QueryHook] = None,
 ) -> Namespace:
     ...  # pragma: no cover
 
@@ -66,6 +68,7 @@ def generate_api(
     extension: str = '.sql',
     namespace_mode: NAMESPACE_MODE = 'dirs',
     namespace_root: str = '__init__',
+    hook: Optional[QueryHook] = None,
 ) -> T:
     ...  # pragma: no cover
 
@@ -79,12 +82,16 @@ def generate_api(
     extension: str = '.sql',
     namespace_mode: NAMESPACE_MODE = 'dirs',
     namespace_root: str = '__init__',
+    hook: Optional[QueryHook] = None,
 ) -> Union[T, Namespace]:
     ns: Union[T, Namespace]
     if target is None:
         ns = Namespace()
     else:
         ns = target
+
+    if hook is None:
+        hook = default_query_hook
 
     driver_module = importlib.import_module(f'aesqlapius.drivers.{driver}')
 
@@ -97,7 +104,7 @@ def generate_api(
             namespace_path = entry.namespace_path[:-1]
 
         for query in queries:
-            method_func = driver_module.generate_method(query)  # type: ignore
+            method_func = driver_module.generate_method(query, hook)  # type: ignore
 
             if db is not None:
                 method_func = functools.partial(method_func, db)
