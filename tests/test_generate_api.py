@@ -3,6 +3,7 @@ from aesqlapius import generate_api
 from .fixtures import *  # noqa
 
 
+# checks loading from single file and database connection binding
 def test_default(queries_dir, dbenv):
     api = generate_api(queries_dir / 'ping.sql', dbenv.driver, dbenv.db)
 
