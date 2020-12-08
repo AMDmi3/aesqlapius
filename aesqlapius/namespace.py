@@ -23,8 +23,8 @@ from typing import Any, Callable, List, TYPE_CHECKING
 
 class Namespace:
     if TYPE_CHECKING:
-        def __getattr__(self, name: str) -> Any:
-            pass
+        def __getattr__(self, name: str) -> Any:  # pragma: no cover
+            pass  # pragma: no cover
 
 
 def inject_method(root: Any, namespace_path: List[str], method: Callable[..., Any]) -> None:
