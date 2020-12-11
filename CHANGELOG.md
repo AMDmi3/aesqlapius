@@ -1,5 +1,9 @@
 # Changelog
 
+## unreleased
+
+* Add aiopg support
+
 ## 0.0.6
 
 * Fix packaging: do not install tests

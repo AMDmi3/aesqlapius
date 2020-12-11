@@ -16,8 +16,8 @@ class DBEnv:
     query_adaptor: Callable[[str, Dict[str, Any]], str] = None
 
 
-@pytest.fixture(params=['psycopg2', 'sqlite3', 'mysql'])
-def dbenv(request, tmp_path):
+@pytest.fixture(params=['psycopg2', 'sqlite3', 'mysql', 'aiopg'])
+async def dbenv(request, tmp_path):
     if request.param == 'psycopg2':
         try:
             import psycopg2
@@ -27,7 +27,7 @@ def dbenv(request, tmp_path):
         if not os.environ.get('POSTGRESQL_DSN'):
             pytest.skip('No POSTGRESQL_DSN envvar defined, skipping postgresql related tests', allow_module_level=True)
 
-        return DBEnv(
+        yield DBEnv(
             request.param,
             psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
         )
@@ -41,7 +41,7 @@ def dbenv(request, tmp_path):
         if not os.environ.get('MYSQL_DSN'):
             pytest.skip('No MYSQL_DSN envvar defined, skipping mysql related tests', allow_module_level=True)
 
-        return DBEnv(
+        yield DBEnv(
             request.param,
             mysql.connector.connect(**{
                 k: v
@@ -61,11 +61,26 @@ def dbenv(request, tmp_path):
         def convert_query_to_sqlite(text, kwargs):
             return re.sub(r'%\(([^()]+)\)s', r':\1', text)
 
-        return DBEnv(
+        yield DBEnv(
             request.param,
             sqlite3.connect(tmp_path / 'db.sqlite'),
             convert_query_to_sqlite
         )
+
+    elif request.param == 'aiopg':
+        try:
+            import aiopg
+        except ImportError:
+            pytest.skip('Cannot import aiopg, skipping related tests', allow_module_level=True)
+
+        if not os.environ.get('POSTGRESQL_DSN'):
+            pytest.skip('No POSTGRESQL_DSN envvar defined, skipping postgresql related tests', allow_module_level=True)
+
+        async with aiopg.create_pool(os.environ.get('POSTGRESQL_DSN')) as pool:
+            yield DBEnv(
+                request.param,
+                pool
+            )
 
     else:
         assert(False)
