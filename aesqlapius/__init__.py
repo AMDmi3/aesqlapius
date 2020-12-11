@@ -109,6 +109,8 @@ def generate_api(
             if db is not None:
                 method_func = functools.partial(method_func, db)
 
+            method_func.aesqlapius_method = True
+
             inject_method(
                 ns,
                 namespace_path + [query.func_def.name],
