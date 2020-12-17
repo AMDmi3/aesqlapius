@@ -18,6 +18,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from aesqlapius.drivers.aiopg_pool import generate_method as generate_method
+from typing import Any, AsyncIterator, Callable, Dict
 
-__all__ = ['generate_method']
+from aesqlapius.asyncmethod import (
+    AbstractDriverDetail,
+    generate_method_generic
+)
+from aesqlapius.hook import QueryHook
+from aesqlapius.query import Query
+
+
+class _Detail(AbstractDriverDetail):
+    async def yield_cursor(self, db: Any, **kwargs: Dict[str, Any]) -> AsyncIterator[Any]:
+        async with db.cursor() as cur:  # db is aiopg.Connection
+            yield cur
+
+
+def generate_method(query: Query, hook: QueryHook) -> Callable[..., Any]:
+    return generate_method_generic(query, _Detail(), hook)
