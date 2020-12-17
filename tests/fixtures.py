@@ -16,6 +16,32 @@ __all__ = [
 ]
 
 
+class DSN:
+    args: Dict[str, str]
+
+    def __init__(self, envname: str, dbtype: str) -> None:
+        if not (dsn := os.environ.get(envname)):
+            pytest.skip(f'No {envname} environment variable set, skipping {dbtype} database tests', allow_module_level=True)
+
+        if dbtype in ('psycopg2', 'aiopg'):
+            dbname_arg = 'dbname'
+        else:
+            dbname_arg = 'database'
+
+        self.args = {}
+
+        for item in dsn.split():
+            k, v = item.split('=', 1)
+
+            if k in ('database', 'dbname'):
+                self.args[dbname_arg] = v
+            else:
+                self.args[k] = v
+
+    def get(self):
+        return self.args
+
+
 @dataclass
 class DBEnv:
     driver: str
@@ -29,12 +55,9 @@ async def create_dbenv_psycopg2():
     except ImportError:
         pytest.skip('Cannot import psycopg2, skipping related tests', allow_module_level=True)
 
-    if not os.environ.get('POSTGRESQL_DSN'):
-        pytest.skip('No POSTGRESQL_DSN envvar defined, skipping postgresql related tests', allow_module_level=True)
-
     yield DBEnv(
         'psycopg2',
-        psycopg2.connect(os.environ.get('POSTGRESQL_DSN'))
+        psycopg2.connect(**DSN('POSTGRESQL_DSN', 'psycopg2').get())
     )
 
 
@@ -44,18 +67,9 @@ async def create_dbenv_mysql():
     except ImportError:
         pytest.skip('Cannot import mysql.connector, skipping related tests', allow_module_level=True)
 
-    if not os.environ.get('MYSQL_DSN'):
-        pytest.skip('No MYSQL_DSN envvar defined, skipping mysql related tests', allow_module_level=True)
-
     yield DBEnv(
         'mysql',
-        mysql.connector.connect(**{
-            k: v
-            for k, v in map(
-                lambda s: s.split('=', 1),
-                os.environ.get('MYSQL_DSN').split()
-            )
-        })
+        mysql.connector.connect(**DSN('MYSQL_DSN', 'mysql').get())
     )
 
 
@@ -81,10 +95,7 @@ async def create_dbenv_aiopg():
     except ImportError:
         pytest.skip('Cannot import aiopg, skipping related tests', allow_module_level=True)
 
-    if not os.environ.get('POSTGRESQL_DSN'):
-        pytest.skip('No POSTGRESQL_DSN envvar defined, skipping postgresql related tests', allow_module_level=True)
-
-    async with aiopg.create_pool(os.environ.get('POSTGRESQL_DSN')) as pool:
+    async with aiopg.create_pool(**DSN('POSTGRESQL_DSN', 'aiopg').get()) as pool:
         yield DBEnv(
             'aiopg',
             pool
