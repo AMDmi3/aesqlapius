@@ -42,12 +42,13 @@ __version__ = '0.0.6'
 
 T = TypeVar('T')
 NAMESPACE_MODE = Literal['dirs', 'files', 'flat']
+DRIVER = Literal['psycop2', 'sqlite3', 'mysql', 'aiopg']
 
 
 @overload
 def generate_api(
     path: str,
-    driver: str,
+    driver: DRIVER,
     db: Any = None,
     *,
     extension: str = '.sql',
@@ -61,7 +62,7 @@ def generate_api(
 @overload
 def generate_api(
     path: str,
-    driver: str,
+    driver: DRIVER,
     db: Any = None,
     *,
     target: T,
@@ -75,7 +76,7 @@ def generate_api(
 
 def generate_api(
     path: str,
-    driver: str,
+    driver: DRIVER,
     db: Any = None,
     *,
     target: Optional[T] = None,
