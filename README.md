@@ -11,12 +11,12 @@
 
 ## Summary
 
-So you don't want to use ORM, and want to organize your SQL queries
+So you don't want to use ORM, but want to organize your SQL queries
 in a convenient way. Don't mix them with your python code, don't
 write `execute` and `fetchrow`s by hand for each query. With
 **aesqlapius**:
 
-- Store your SQL queries separate from the code, in a dedicated
+- Store your SQL queries separately from the code, in a dedicated
   file or directory hierarchy
 - Annotate each query with python-like function definition specifying
   input arguments and output types and patterns
@@ -88,7 +88,7 @@ The module has a single entry point in form of a function:
 def generate_api(path, driver, db=None, *, target=None, extension='.sql', namespace_mode='dirs', namespace_root='__init__')
 ```
 
-This loads SQL queries from *path* (a file or directory) and returns an API class to use with specified database *driver* (`psycopg2`, `sqlite3`, `mysql`).
+This loads SQL queries from *path* (a file or directory) and returns an API class to use with specified database *driver* (`psycopg2`, `sqlite3`, `mysql`, `aiopg`, `aiopg_conn`).
 
 If *db* is specified, all generated methods are bound to the given database connection object:
 
@@ -215,7 +215,71 @@ SELECT 'foo' AS key, 1 AS a, 2 AS b;
 
 #### Body
 
-Function body is required to contain a single ellipsis.
+Function body of the annotationis required to contain a single ellipsis.
+
+## Drivers
+
+### psycopg2
+
+Use with [psycopg2](https://pypi.org/project/psycopg2/), pass psycopg2 connection:
+
+```python
+import aesqlapius, psycopg2
+dbconn = psycopg2.connect('dname=... user=... password=...')
+api = aesqlapius.generate_api('queries.sql', 'psycopg2', dbconn)
+api.some_method(arg1=1, arg2=2)
+```
+
+### sqlite3
+
+Use with `sqlite3` module (bundled with python), pass sqlite3 connection:
+
+```python
+import aesqlapius, sqlite3
+dbconn = sqlite3.connect('path_to_database.sqlite')
+api = aesqlapius.generate_api('queries.sql', 'sqlite3', dbconn)
+api.some_method(arg1=1, arg2=2)
+```
+
+### mysql
+
+Use with [mysql.connector](https://dev.mysql.com/doc/connector-python/en/) module, pass mysql connection:
+
+```python
+import aesqlapius, mysql.connector
+dbconn = mysql.connector.connect(database=..., user=..., password=...)
+api = aesqlapius.generate_api('queries.sql', 'mysql', dbconn)
+api.some_method(arg1=1, arg2=2)
+```
+
+Note: the driver uses `buffered=True` parameter when creating cursor.
+
+### aiopg
+
+Use with [aiopg](https://pypi.org/project/aiopg/) module. This driver generates asynchronous APIs. There are two flavors, `aiopg_pool` (or just `aiopg`) to use with aiopg pool objects:
+
+```python
+import aesqlapius, aiopg
+
+async def main():
+    async with aiopg.create_pool('dname=... user=... password=...') as pool:
+        api = aesqlapius.generate_api('queries.sql', 'aiopg_pool', pool)
+        await api.some_method(arg1=1, arg2=2)
+```
+
+In this mode, each aesqlapius method acquires SQL connection from the pool internally, so you can use it the same way as synchronous API, but keep in mind that each method may be executed in a separate connection, so you may not, for example, span transactions across multiple methods.
+
+Another flavor is `aiopg_conn` and it takes aiopg connection object instead of a pool. Since you likely don't want to recreate API each time you obtain a connection, the most useful way to use aesqlapius with this driver would be to not bind database to an API and instead pass a connecton to each method call:
+
+```python
+import aesqlapius, aiopg
+
+async def main():
+    api = aesqlapius.generate_api('queries.sql', 'aiopg_conn')
+    async with aiopg.create_pool('dname=... user=... password=...') as pool:
+        async with pool.acquire() as conn:
+	    await api.some_method(conn, arg1=1, arg2=2)
+```
 
 ## License
 
