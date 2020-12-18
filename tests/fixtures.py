@@ -132,6 +132,19 @@ async def create_dbenv_aiopg():
         )
 
 
+async def create_dbenv_asyncpg():
+    try:
+        import asyncpg
+    except ImportError:
+        pytest.skip('Cannot import asyncpg, skipping related tests', allow_module_level=True)
+
+    async with asyncpg.create_pool(**DSN('POSTGRESQL_DSN', 'asyncpg').get()) as pool:
+        yield DBEnv(
+            'asyncpg',
+            pool
+        )
+
+
 @pytest.fixture
 async def dbenv_psycopg2():
     async for dummy in create_dbenv_psycopg2():
@@ -156,7 +169,13 @@ async def dbenv_aiopg():
         yield dummy
 
 
-@pytest.fixture(params=['psycopg2', 'sqlite3', 'mysql', 'aiopg'])
+@pytest.fixture
+async def dbenv_asyncpg():
+    async for dummy in create_dbenv_aiopg():
+        yield dummy
+
+
+@pytest.fixture(params=['psycopg2', 'sqlite3', 'mysql', 'aiopg', 'asyncpg'])
 async def dbenv(request, tmp_path):
     if request.param == 'psycopg2':
         async for dummy in create_dbenv_psycopg2():
@@ -169,6 +188,9 @@ async def dbenv(request, tmp_path):
             yield dummy
     elif request.param == 'aiopg':
         async for dummy in create_dbenv_aiopg():
+            yield dummy
+    elif request.param == 'asyncpg':
+        async for dummy in create_dbenv_asyncpg():
             yield dummy
     else:
         assert(False)

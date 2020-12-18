@@ -1,5 +1,6 @@
 -- def swap_args(a: int = 0, b: str = 'a') -> Single[Tuple]: ...
 SELECT :b AS a, :a AS b;             -- sqlite3
+SELECT $2::text AS a, $1::int AS b;  -- asyncpg
 SELECT %(b)s AS a, %(a)s AS b;       -- others
 
 -- def cleanup_test_table() -> None: ...
