@@ -50,7 +50,7 @@ class ReturnValueInnerFormat(Enum):
 @dataclass
 class ReturnValueDefinition:
     outer_format: ReturnValueOuterFormat
-    inner_format: Union[ReturnValueInnerFormat, str]
+    inner_format: ReturnValueInnerFormat
     outer_dict_by: Union[None, str, int] = None
     remove_key_column: bool = False
 
@@ -62,7 +62,7 @@ class FunctionDefinition:
     returns: Optional[ReturnValueDefinition] = None
 
 
-def _parse_return_value_inner(node: ast.AST) -> Union[ReturnValueInnerFormat, str]:
+def _parse_return_value_inner(node: ast.AST) -> ReturnValueInnerFormat:
     # in future, support subscripts with detailed type specifications
     assert isinstance(node, ast.Name)
 
@@ -73,7 +73,7 @@ def _parse_return_value_inner(node: ast.AST) -> Union[ReturnValueInnerFormat, st
     elif node.id == 'Value':
         return ReturnValueInnerFormat.VALUE
     else:  # custom type
-        return node.id
+        raise TypeError(f'Unexpected row format {node.id}')
 
 
 def _parse_return_value_outer(node: ast.Subscript) -> ReturnValueDefinition:
@@ -110,7 +110,7 @@ def _parse_return_value_outer(node: ast.Subscript) -> ReturnValueDefinition:
     elif node.value.id == 'Single':
         outer_format = ReturnValueOuterFormat.SINGLE
     else:
-        raise TypeError(f'Unexpected return value type {node.value.id}')
+        raise TypeError(f'Unexpected rows format {node.value.id}')
 
     return ReturnValueDefinition(
         outer_format=outer_format,

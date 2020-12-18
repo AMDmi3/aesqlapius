@@ -194,19 +194,6 @@ def test_returns_inner_value():
     )
 
 
-def test_returns_inner_custom():
-    assert parse_function_definition(
-        'def Foo() -> Single[MyType]: ...'
-    ) == FunctionDefinition(
-        name='Foo',
-        args=[],
-        returns=ReturnValueDefinition(
-            outer_format=ReturnValueOuterFormat.SINGLE,
-            inner_format='MyType'
-        )
-    )
-
-
 def test_returns_invalid():
     with pytest.raises(TypeError):
         parse_function_definition('def Foo() -> BadType[List]: ...')
@@ -219,5 +206,5 @@ def test_accepts_complex_arg_annotations():
 
 @pytest.mark.xfail
 def test_accepts_complex_return_annotations():
-    parse_function_definition('def Foo() -> Single[Single[bool]]: ...')
-    parse_function_definition('def Foo() -> Single[Single[Tuple[str, int]]]: ...')
+    parse_function_definition('def Foo() -> Single[Value[bool]]: ...')
+    parse_function_definition('def Foo() -> Single[Value[Tuple[str, int]]]: ...')
