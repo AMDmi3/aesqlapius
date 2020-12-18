@@ -86,6 +86,7 @@ class DBEnv:
     'aiopg_pool',
     'aiopg_conn',
     'asyncpg_pool',
+    'asyncpg_pool_conn',
     'asyncpg_conn',
 ])
 async def dbenv(request, tmp_path):
@@ -112,11 +113,15 @@ async def dbenv(request, tmp_path):
             import asyncpg
             async with asyncpg.create_pool(**DSN('POSTGRESQL_DSN', 'asyncpg').get()) as pool:
                 yield DBEnv('asyncpg', pool)
-        elif request.param == 'asyncpg_conn':
+        elif request.param == 'asyncpg_pool_conn':
             import asyncpg
             async with asyncpg.create_pool(**DSN('POSTGRESQL_DSN', 'asyncpg').get()) as pool:
                 async with pool.acquire() as conn:
                     yield DBEnv('asyncpg', conn)
+        elif request.param == 'asyncpg_conn':
+            import asyncpg
+            conn = await asyncpg.connect(**DSN('POSTGRESQL_DSN', 'asyncpg').get())
+            yield DBEnv('asyncpg', conn)
         else:
             assert(False)
 
