@@ -46,7 +46,7 @@ def _generate_row_processor(inner_format: Union[ReturnValueInnerFormat, str]) ->
             return row[0] if row else None
         return process_row_single
     else:
-        raise NotImplementedError(f"unsupported inner return type format '{inner_format}'")  # pragma: no
+        raise NotImplementedError(f"unsupported inner return type format '{inner_format}'")  # pragma: no cover
 
 
 def _generate_row_processor_removing_index(inner_format: Union[ReturnValueInnerFormat, str], remove: int) -> Callable[[Tuple[Any]], Any]:
@@ -65,7 +65,7 @@ def _generate_row_processor_removing_index(inner_format: Union[ReturnValueInnerF
             return row[0 if remove > 0 else 1] if len(row) > 1 else None
         return process_row_single
     else:
-        raise NotImplementedError(f"unsupported inner return type format '{inner_format}'")  # pragma: no
+        raise NotImplementedError(f"unsupported inner return type format '{inner_format}'")  # pragma: no cover
 
 
 def _generate_row_processor_removing_name(inner_format: Union[ReturnValueInnerFormat, str], remove: str) -> Callable[[Tuple[Any]], Any]:
@@ -86,7 +86,7 @@ def _generate_row_processor_removing_name(inner_format: Union[ReturnValueInnerFo
             return row[0 if row.keys()[0] != remove else 1] if len(row) > 1 else None
         return process_row_single
     else:
-        raise NotImplementedError(f"unsupported inner return type format '{inner_format}'")  # pragma: no
+        raise NotImplementedError(f"unsupported inner return type format '{inner_format}'")  # pragma: no cover
 
 
 @asynccontextmanager
