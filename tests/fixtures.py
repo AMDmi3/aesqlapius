@@ -1,5 +1,6 @@
 import os
 import re
+from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict
@@ -46,7 +47,40 @@ class DSN:
 class DBEnv:
     driver: str
     db: Any
-    query_adaptor: Callable[[str, Dict[str, Any]], str] = None
+
+    def get_query_preprocessor(self):
+        def hook(text, kwargs):
+            output = []
+
+            conditionals = defaultdict(list)
+
+            def flush():
+                nonlocal conditionals, output
+                if conditionals:
+                    if self.driver in conditionals:
+                        output += conditionals[self.driver]
+                    elif 'others' in conditionals:
+                        output += conditionals['others']
+                    elif 'other' in conditionals:
+                        output += conditionals['other']
+                    conditionals = defaultdict(list)
+
+            for line in text.split('\n'):
+                if match := re.fullmatch('(.*?)[ \t]+-- ([a-z0-9_]+)', line):
+                    conditionals[match.group(2)].append(match.group(1))
+                else:
+                    flush()
+                    output.append(line)
+
+            flush()
+
+            res = '\n'.join(output)
+            if res != text:
+                print(text)
+                print(res)
+            return '\n'.join(output)
+
+        return hook
 
 
 async def create_dbenv_psycopg2():
@@ -79,13 +113,9 @@ async def create_dbenv_sqlite3(tmp_path):
     except ImportError:
         pytest.skip('Cannot import sqlite3, skipping related tests', allow_module_level=True)
 
-    def convert_query_to_sqlite(text, kwargs):
-        return re.sub(r'%\(([^()]+)\)s', r':\1', text)
-
     yield DBEnv(
         'sqlite3',
-        sqlite3.connect(tmp_path / 'db.sqlite'),
-        convert_query_to_sqlite
+        sqlite3.connect(tmp_path / 'db.sqlite')
     )
 
 

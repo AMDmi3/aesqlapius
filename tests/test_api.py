@@ -8,7 +8,7 @@ from .helpers import convert_api_to_async
 
 @pytest.fixture()
 async def api(queries_dir, dbenv):
-    api = generate_api(queries_dir / 'api', dbenv.driver, dbenv.db, hook=dbenv.query_adaptor)
+    api = generate_api(queries_dir / 'api', dbenv.driver, dbenv.db, hook=dbenv.get_query_preprocessor())
     convert_api_to_async(api)
     await api.cleanup_test_table()
     await api.create_test_table()
