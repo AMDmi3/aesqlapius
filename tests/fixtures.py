@@ -3,16 +3,12 @@ import re
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Dict
+from typing import Any, Dict
 
 import pytest
 
 __all__ = [
     'dbenv',
-    'dbenv_psycopg2',
-    'dbenv_sqlite3',
-    'dbenv_mysql',
-    'dbenv_aiopg',
     'queries_dir'
 ]
 
@@ -83,117 +79,49 @@ class DBEnv:
         return hook
 
 
-async def create_dbenv_psycopg2():
-    try:
-        import psycopg2
-    except ImportError:
-        pytest.skip('Cannot import psycopg2, skipping related tests', allow_module_level=True)
-
-    yield DBEnv(
-        'psycopg2',
-        psycopg2.connect(**DSN('POSTGRESQL_DSN', 'psycopg2').get())
-    )
-
-
-async def create_dbenv_mysql():
-    try:
-        import mysql.connector
-    except ImportError:
-        pytest.skip('Cannot import mysql.connector, skipping related tests', allow_module_level=True)
-
-    yield DBEnv(
-        'mysql',
-        mysql.connector.connect(**DSN('MYSQL_DSN', 'mysql').get())
-    )
-
-
-async def create_dbenv_sqlite3(tmp_path):
-    try:
-        import sqlite3
-    except ImportError:
-        pytest.skip('Cannot import sqlite3, skipping related tests', allow_module_level=True)
-
-    yield DBEnv(
-        'sqlite3',
-        sqlite3.connect(tmp_path / 'db.sqlite')
-    )
-
-
-async def create_dbenv_aiopg():
-    try:
-        import aiopg
-    except ImportError:
-        pytest.skip('Cannot import aiopg, skipping related tests', allow_module_level=True)
-
-    async with aiopg.create_pool(**DSN('POSTGRESQL_DSN', 'aiopg').get()) as pool:
-        yield DBEnv(
-            'aiopg',
-            pool
-        )
-
-
-async def create_dbenv_asyncpg():
-    try:
-        import asyncpg
-    except ImportError:
-        pytest.skip('Cannot import asyncpg, skipping related tests', allow_module_level=True)
-
-    async with asyncpg.create_pool(**DSN('POSTGRESQL_DSN', 'asyncpg').get()) as pool:
-        yield DBEnv(
-            'asyncpg',
-            pool
-        )
-
-
-@pytest.fixture
-async def dbenv_psycopg2():
-    async for dummy in create_dbenv_psycopg2():
-        yield dummy
-
-
-@pytest.fixture
-async def dbenv_mysql():
-    async for dummy in create_dbenv_mysql():
-        yield dummy
-
-
-@pytest.fixture
-async def dbenv_sqlite3(tmp_path):
-    async for dummy in create_dbenv_sqlite3(tmp_path):
-        yield dummy
-
-
-@pytest.fixture
-async def dbenv_aiopg():
-    async for dummy in create_dbenv_aiopg():
-        yield dummy
-
-
-@pytest.fixture
-async def dbenv_asyncpg():
-    async for dummy in create_dbenv_aiopg():
-        yield dummy
-
-
-@pytest.fixture(params=['psycopg2', 'sqlite3', 'mysql', 'aiopg', 'asyncpg'])
+@pytest.fixture(params=[
+    'psycopg2',
+    'sqlite3',
+    'mysql',
+    'aiopg_pool',
+    'aiopg_conn',
+    'asyncpg_pool',
+    'asyncpg_conn',
+])
 async def dbenv(request, tmp_path):
-    if request.param == 'psycopg2':
-        async for dummy in create_dbenv_psycopg2():
-            yield dummy
-    elif request.param == 'mysql':
-        async for dummy in create_dbenv_mysql():
-            yield dummy
-    elif request.param == 'sqlite3':
-        async for dummy in create_dbenv_sqlite3(tmp_path):
-            yield dummy
-    elif request.param == 'aiopg':
-        async for dummy in create_dbenv_aiopg():
-            yield dummy
-    elif request.param == 'asyncpg':
-        async for dummy in create_dbenv_asyncpg():
-            yield dummy
-    else:
-        assert(False)
+    try:
+        if request.param == 'psycopg2':
+            import psycopg2
+            yield DBEnv('psycopg2', psycopg2.connect(**DSN('POSTGRESQL_DSN', 'psycopg2').get()))
+        elif request.param == 'mysql':
+            import mysql.connector
+            yield DBEnv('mysql', mysql.connector.connect(**DSN('MYSQL_DSN', 'mysql').get()))
+        elif request.param == 'sqlite3':
+            import sqlite3
+            yield DBEnv('sqlite3', sqlite3.connect(tmp_path / 'db.sqlite'))
+        elif request.param == 'aiopg_pool':
+            import aiopg
+            async with aiopg.create_pool(**DSN('POSTGRESQL_DSN', 'aiopg').get()) as pool:
+                yield DBEnv('aiopg', pool)
+        elif request.param == 'aiopg_conn':
+            import aiopg
+            async with aiopg.create_pool(**DSN('POSTGRESQL_DSN', 'aiopg').get()) as pool:
+                async with pool.acquire() as conn:
+                    yield DBEnv('aiopg', conn)
+        elif request.param == 'asyncpg_pool':
+            import asyncpg
+            async with asyncpg.create_pool(**DSN('POSTGRESQL_DSN', 'asyncpg').get()) as pool:
+                yield DBEnv('asyncpg', pool)
+        elif request.param == 'asyncpg_conn':
+            import asyncpg
+            async with asyncpg.create_pool(**DSN('POSTGRESQL_DSN', 'asyncpg').get()) as pool:
+                async with pool.acquire() as conn:
+                    yield DBEnv('asyncpg', conn)
+        else:
+            assert(False)
+
+    except ImportError as e:
+        pytest.skip(f'Cannot import {e.name}, skipping related tests', allow_module_level=True)
 
 
 @pytest.fixture
