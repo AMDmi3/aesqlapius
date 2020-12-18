@@ -22,7 +22,7 @@ import os
 from dataclasses import dataclass
 from typing import Iterator, List, Optional, Tuple
 
-from aesqlapius.query import Query, parse_query_file
+from aesqlapius.query import Query, parse_queries_from_path
 
 
 @dataclass
@@ -50,10 +50,10 @@ def _walk_dir_tree(path: str, extension: str, namespace_path: Optional[List[str]
 def iter_queries(path: str, extension: str) -> Iterator[Tuple[QueryDirEntry, List[Query]]]:
     if os.path.isdir(path):
         for entry in _walk_dir_tree(path, extension):
-            yield (entry, parse_query_file(entry.filesystem_path))
+            yield (entry, parse_queries_from_path(entry.filesystem_path))
     else:
         entry = QueryDirEntry(
             [str(os.path.basename(path)).removesuffix(extension)],
             path
         )
-        yield (entry, parse_query_file(path))
+        yield (entry, parse_queries_from_path(path))

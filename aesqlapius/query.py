@@ -19,7 +19,7 @@
 # THE SOFTWARE.
 
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import IO, List, Optional
 
 from aesqlapius.function_def import (
     FunctionDefinition,
@@ -33,7 +33,7 @@ class Query:
     text: str
 
 
-def parse_query_file(path: str) -> List[Query]:
+def parse_queries_from_fd(fd: IO[str]) -> List[Query]:
     func_def: Optional[FunctionDefinition] = None
     text = ''
     res = []
@@ -45,14 +45,18 @@ def parse_query_file(path: str) -> List[Query]:
         func_def = None
         text = ''
 
-    with open(path, 'r') as fd:
-        for line in fd:
-            if line.startswith('-- def '):
-                flush()
-                func_def = parse_function_definition(line.removeprefix('-- '))
+    for line in fd:
+        if line.startswith('-- def '):
+            flush()
+            func_def = parse_function_definition(line.removeprefix('-- '))
 
-            text += line
+        text += line
 
     flush()
 
     return res
+
+
+def parse_queries_from_path(path: str) -> List[Query]:
+    with open(path, 'r') as fd:
+        return parse_queries_from_fd(fd)
