@@ -35,6 +35,7 @@ jobs:
           pip install psycopg2
           pip install mysql-connector-python
           pip install aiopg
+          pip install asyncpg
       - name: Run flake8
         run: make flake8
       - name: Run mypy
@@ -45,7 +46,7 @@ jobs:
         run: make test
         env:
           PYTEST_ARGS: --cov-report=xml --cov=aesqlapius
-          POSTGRESQL_DSN: dbname=aesqlapius user=aesqlapius password=aesqlapius host=localhost port=5432
+          POSTGRESQL_DSN: database=aesqlapius user=aesqlapius password=aesqlapius host=localhost port=5432
           MYSQL_DSN: database=aesqlapius user=aesqlapius password=aesqlapius host=localhost port=3306
       - name: Push coverage info
         run: codecov
