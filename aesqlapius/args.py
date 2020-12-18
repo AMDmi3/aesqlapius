@@ -44,5 +44,5 @@ def prepare_args_as_dict(func_def: FunctionDefinition, args: Tuple[Any, ...], kw
     return {arg.name: value for arg, value in _iter_args(func_def, args, kwargs)}
 
 
-def prepare_args_as_list(func_def, args: Tuple[Any, ...], kwargs: Dict[str, Any]) -> List[Any]:
+def prepare_args_as_list(func_def: FunctionDefinition, args: Tuple[Any, ...], kwargs: Dict[str, Any]) -> List[Any]:
     return [value for arg, value in _iter_args(func_def, args, kwargs)]

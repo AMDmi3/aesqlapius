@@ -24,9 +24,9 @@ from typing import Any, Callable, Dict, List, Tuple, Union
 from aesqlapius.function_def import ReturnValueInnerFormat
 
 
-def generate_row_processor(inner_format: Union[ReturnValueInnerFormat, str], field_names: List[str], stack_depth: int = 2) -> Callable[[Tuple[Any]], Any]:
+def generate_row_processor(inner_format: Union[ReturnValueInnerFormat, str], field_names: List[str], stack_depth: int = 2) -> Callable[[Tuple[Any, ...]], Any]:
     if isinstance(inner_format, str):
-        def process_row_custom(row: Tuple[Any]) -> Dict[str, Any]:
+        def process_row_custom(row: Tuple[Any, ...]) -> Dict[str, Any]:
             # get the frame of method caller; usually,
             # [0] is process_row
             # [1] is generated method
@@ -43,24 +43,24 @@ def generate_row_processor(inner_format: Union[ReturnValueInnerFormat, str], fie
             else:
                 raise NameError(f"name '{inner_format}' is not defined")
 
-            return custom_format(**dict(zip(field_names, row)))
+            return custom_format(**dict(zip(field_names, row)))  # type: ignore
 
         return process_row_custom
 
     elif inner_format == ReturnValueInnerFormat.TUPLE:
-        def process_row_tuple(row: Tuple[Any]) -> Tuple[Any]:
+        def process_row_tuple(row: Tuple[Any, ...]) -> Tuple[Any, ...]:
             return row
 
         return process_row_tuple
 
     elif inner_format == ReturnValueInnerFormat.DICT:
-        def process_row_dict(row: Tuple[Any]) -> Dict[str, Any]:
+        def process_row_dict(row: Tuple[Any, ...]) -> Dict[str, Any]:
             return dict(zip(field_names, row))
 
         return process_row_dict
 
     elif inner_format == ReturnValueInnerFormat.VALUE:
-        def process_row_single(row: Tuple[Any]) -> Any:
+        def process_row_single(row: Tuple[Any, ...]) -> Any:
             return row[0] if row else None
 
         return process_row_single

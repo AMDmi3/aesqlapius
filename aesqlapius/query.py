@@ -38,7 +38,7 @@ def parse_query_file(path: str) -> List[Query]:
     text = ''
     res = []
 
-    def flush():
+    def flush() -> None:
         nonlocal func_def, text, res
         if func_def and text:
             res.append(Query(func_def, text))

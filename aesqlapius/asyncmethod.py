@@ -42,7 +42,7 @@ def generate_method_generic(query: Query, detail: AbstractDriverDetail, hook: Qu
     get_cursor = asynccontextmanager(detail.yield_cursor)
 
     if returns is None:
-        async def method_returning_none(db, *args, **kwargs) -> None:
+        async def method_returning_none(db: Any, *args: Any, **kwargs: Any) -> None:
             async with get_cursor(db) as cur:
                 prepared_args = prepare_args_as_dict(func_def, args, kwargs)
                 await cur.execute(hook(query.text, prepared_args), prepared_args)
@@ -50,7 +50,7 @@ def generate_method_generic(query: Query, detail: AbstractDriverDetail, hook: Qu
         return method_returning_none
 
     elif returns.outer_format == ReturnValueOuterFormat.ITERATOR:
-        async def method_returning_iterator(db, *args, **kwargs) -> AsyncIterator[Any]:
+        async def method_returning_iterator(db: Any, *args: Any, **kwargs: Any) -> AsyncIterator[Any]:
             assert(returns is not None)  # mypy bug
             async with get_cursor(db) as cur:
                 prepared_args = prepare_args_as_dict(func_def, args, kwargs)
@@ -63,7 +63,7 @@ def generate_method_generic(query: Query, detail: AbstractDriverDetail, hook: Qu
         return method_returning_iterator
 
     elif returns.outer_format == ReturnValueOuterFormat.LIST:
-        async def method_returning_list(db, *args, **kwargs) -> List[Any]:
+        async def method_returning_list(db: Any, *args: Any, **kwargs: Any) -> List[Any]:
             assert(returns is not None)  # mypy bug
             async with get_cursor(db) as cur:
                 prepared_args = prepare_args_as_dict(func_def, args, kwargs)
@@ -75,7 +75,7 @@ def generate_method_generic(query: Query, detail: AbstractDriverDetail, hook: Qu
         return method_returning_list
 
     elif returns.outer_format == ReturnValueOuterFormat.SINGLE:
-        async def method_returning_single(db, *args, **kwargs) -> Any:
+        async def method_returning_single(db: Any, *args: Any, **kwargs: Any) -> Any:
             assert(returns is not None)  # mypy bug
             async with get_cursor(db) as cur:
                 prepared_args = prepare_args_as_dict(func_def, args, kwargs)
@@ -87,7 +87,7 @@ def generate_method_generic(query: Query, detail: AbstractDriverDetail, hook: Qu
         return method_returning_single
 
     elif returns.outer_format == ReturnValueOuterFormat.DICT:
-        async def method_returning_dict(db, *args, **kwargs) -> Any:
+        async def method_returning_dict(db: Any, *args: Any, **kwargs: Any) -> Any:
             assert(returns is not None)  # mypy bug
             async with get_cursor(db) as cur:
                 prepared_args = prepare_args_as_dict(func_def, args, kwargs)
