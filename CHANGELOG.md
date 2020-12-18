@@ -3,6 +3,7 @@
 ## unreleased
 
 * Add aiopg support
+* Add asyncpg support
 
 ## 0.0.6
 
