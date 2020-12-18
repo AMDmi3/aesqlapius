@@ -1,6 +1,6 @@
 # Changelog
 
-## unreleased
+## 0.0.7
 
 * Add aiopg support
 * Add asyncpg support
