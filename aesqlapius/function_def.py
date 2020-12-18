@@ -72,7 +72,7 @@ def _parse_return_value_inner(node: ast.AST) -> ReturnValueInnerFormat:
         return ReturnValueInnerFormat.DICT
     elif node.id == 'Value':
         return ReturnValueInnerFormat.VALUE
-    else:  # custom type
+    else:
         raise TypeError(f'Unexpected row format {node.id}')
 
 

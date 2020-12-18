@@ -32,7 +32,7 @@ from aesqlapius.query import Query
 class AbstractDriverDetail(ABC):
     @abstractmethod
     async def yield_cursor(self, db: Any, **kwargs: Dict[str, Any]) -> AsyncIterator[Any]:
-        yield None
+        yield None  # pragma: no cover
 
 
 def generate_method_generic(query: Query, detail: AbstractDriverDetail, hook: QueryHook) -> Callable[..., Any]:

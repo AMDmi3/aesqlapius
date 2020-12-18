@@ -194,9 +194,14 @@ def test_returns_inner_value():
     )
 
 
-def test_returns_invalid():
+def test_returns_invalid_outer():
     with pytest.raises(TypeError):
         parse_function_definition('def Foo() -> BadType[List]: ...')
+
+
+def test_returns_invalid_inner():
+    with pytest.raises(TypeError):
+        parse_function_definition('def Foo() -> List[BadType]: ...')
 
 
 @pytest.mark.xfail
