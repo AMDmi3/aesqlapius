@@ -95,39 +95,29 @@ async def test_get_list_value(api):
 
 
 @pytest.mark.asyncio
-async def test_get_dict_of_tuples_by_column_name(api):
-    assert await api.get.dict_of_tuples_by_column_name() == {
-        0: (0, 'a'),
-        1: (1, 'b'),
-        2: (2, 'c'),
-    }
+@pytest.mark.parametrize(
+    'row_format,by,remove,expected',
+    [
+        ('dicts', 'name', False, {0: {'a': 0, 'b': 'a'}, 1: {'a': 1, 'b': 'b'}, 2: {'a': 2, 'b': 'c'}}),
+        ('tuples', 'name', False, {0: (0, 'a'), 1: (1, 'b'), 2: (2, 'c')}),
+        ('values', 'name', False, {0: 0, 1: 1, 2: 2}),
 
+        ('dicts', 'index', False, {0: {'a': 0, 'b': 'a'}, 1: {'a': 1, 'b': 'b'}, 2: {'a': 2, 'b': 'c'}}),
+        ('tuples', 'index', False, {0: (0, 'a'), 1: (1, 'b'), 2: (2, 'c')}),
+        ('values', 'index', False, {0: 0, 1: 1, 2: 2}),
 
-@pytest.mark.asyncio
-async def test_get_dict_of_tuples_by_column_index(api):
-    assert await api.get.dict_of_tuples_by_column_index() == {
-        0: (0, 'a'),
-        1: (1, 'b'),
-        2: (2, 'c'),
-    }
+        ('dicts', 'name', True, {0: {'b': 'a'}, 1: {'b': 'b'}, 2: {'b': 'c'}}),
+        ('tuples', 'name', True, {0: ('a',), 1: ('b',), 2: ('c',)}),
+        ('values', 'name', True, {0: 'a', 1: 'b', 2: 'c'}),
 
-
-@pytest.mark.asyncio
-async def test_get_dict_of_tuples_by_column_name_removed_key(api):
-    assert await api.get.dict_of_tuples_by_column_name_removed_key() == {
-        0: ('a',),
-        1: ('b',),
-        2: ('c',),
-    }
-
-
-@pytest.mark.asyncio
-async def test_get_dict_of_tuples_by_column_index_removed_key(api):
-    assert await api.get.dict_of_tuples_by_column_index_removed_key() == {
-        0: ('a',),
-        1: ('b',),
-        2: ('c',),
-    }
+        ('dicts', 'index', True, {0: {'b': 'a'}, 1: {'b': 'b'}, 2: {'b': 'c'}}),
+        ('tuples', 'index', True, {0: ('a',), 1: ('b',), 2: ('c',)}),
+        ('values', 'index', True, {0: 'a', 1: 'b', 2: 'c'}),
+    ]
+)
+async def test_get_dict_of(api, row_format, by, remove, expected):
+    method = f'dict_of_{row_format}_by_column_{by}{"_removed_key" if remove else ""}'
+    assert await getattr(api.get, method)() == expected
 
 
 @pytest.mark.asyncio
