@@ -83,7 +83,7 @@ def _generate_row_processor_removing_name(inner_format: Union[ReturnValueInnerFo
         return process_row_dict
     elif inner_format == ReturnValueInnerFormat.VALUE:
         def process_row_single(row: asyncpg.Record) -> Any:
-            return row[0 if row.keys()[0] != remove else 1] if len(row) > 1 else None
+            return row[0 if next(iter(row.keys())) != remove else 1] if len(row) > 1 else None
         return process_row_single
     else:
         raise NotImplementedError(f"unsupported inner return type format '{inner_format}'")  # pragma: no cover
