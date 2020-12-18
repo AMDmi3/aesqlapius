@@ -43,7 +43,7 @@ def _generate_row_processor(inner_format: Union[ReturnValueInnerFormat, str]) ->
         return process_row_dict
     elif inner_format == ReturnValueInnerFormat.VALUE:
         def process_row_single(row: asyncpg.Record) -> Any:
-            return row[0] if row else None
+            return row[0] if len(row) > 0 else None
         return process_row_single
     else:
         raise NotImplementedError(f"unsupported inner return type format '{inner_format}'")  # pragma: no cover
