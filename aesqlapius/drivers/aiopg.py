@@ -18,6 +18,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from aesqlapius.drivers.aiopg_pool import generate_method as generate_method
+from contextlib import AsyncExitStack
+from typing import Any, AsyncIterator, Callable, Dict
 
-__all__ = ['generate_method']
+import aiopg
+
+from aesqlapius.asyncmethod import (
+    AbstractDriverDetail,
+    generate_method_generic
+)
+from aesqlapius.hook import QueryHook
+from aesqlapius.query import Query
+
+
+class AiopgDetail(AbstractDriverDetail):
+    async def yield_cursor(self, db: Any, **kwargs: Dict[str, Any]) -> AsyncIterator[Any]:
+        async with AsyncExitStack() as stack:
+            if isinstance(db, aiopg.Pool):
+                db = await stack.enter_async_context(db.acquire())
+
+            async with db.cursor() as cur:
+                yield cur
+
+
+def generate_method(query: Query, hook: QueryHook) -> Callable[..., Any]:
+    return generate_method_generic(query, AiopgDetail(), hook)
