@@ -159,7 +159,7 @@ def parse_function_definition(source: str) -> FunctionDefinition:
         func_def.returns = None
     else:
         if returns is None:
-            raise SyntaxError(f"return value annotation required")
+            raise SyntaxError('return value annotation required')
         elif not isinstance(returns, ast.Subscript):
             raise SyntaxError(f"unexpected rows format '{ast.unparse(returns)}'")
         func_def.returns = _parse_return_value_outer(returns)
