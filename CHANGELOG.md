@@ -3,6 +3,9 @@
 ## unreleased
 
 * Support multiline annotations
+* Allow arbitrary argument and return type annotations (which are
+  currenty ignored)
+* Improve handling of syntax errors in annotations
 
 ## 0.0.7
 
