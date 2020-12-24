@@ -18,8 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import re
 from dataclasses import dataclass
-from typing import IO, List, Optional
+from typing import IO, Iterator, List, Optional, Tuple
 
 from aesqlapius.function_def import (
     FunctionDefinition,
@@ -33,24 +34,58 @@ class Query:
     text: str
 
 
-def parse_queries_from_fd(fd: IO[str]) -> List[Query]:
-    func_def: Optional[FunctionDefinition] = None
-    text = ''
-    res = []
-
-    def flush() -> None:
-        nonlocal func_def, text, res
-        if func_def and text:
-            res.append(Query(func_def, text))
-        func_def = None
-        text = ''
+def _iterate_blocks(fd: IO[str]) -> Iterator[Tuple[bool, List[str]]]:
+    block_is_comment = False
+    lines: List[str] = []
 
     for line in fd:
-        if line.startswith('-- def '):
-            flush()
-            func_def = parse_function_definition(line.removeprefix('-- '))
+        line_is_comment = line.startswith('--')
+        if block_is_comment != line_is_comment and lines:
+            yield block_is_comment, lines
+            lines = []
 
-        text += line
+        block_is_comment = line_is_comment
+        lines.append(line)
+
+    yield block_is_comment, lines
+
+
+def _find_annotation(lines: List[str]) -> Optional[str]:
+    def_idx = 0
+
+    while def_idx < len(lines):
+        if lines[def_idx].startswith('-- def '):
+            break
+        def_idx += 1
+    else:
+        return None
+
+    # in future, we may trace backwards here to include preceeding @decorators
+    start_idx = def_idx
+
+    end_idx = def_idx + 1
+    while end_idx < len(lines) and re.match(r'-- .*[^-\s]', lines[end_idx]):
+        end_idx += 1
+
+    return ''.join(line[3:] for line in lines[start_idx:end_idx])
+
+
+def parse_queries_from_fd(fd: IO[str]) -> List[Query]:
+    res = []
+    current_annotation = ''
+    current_text = ''
+
+    def flush() -> None:
+        nonlocal current_annotation, current_text, res
+        if current_annotation and current_text:
+            res.append(Query(parse_function_definition(current_annotation), current_text))
+
+    for is_comment, lines in _iterate_blocks(fd):
+        if is_comment and (annotation := _find_annotation(lines)) is not None:
+            flush()
+            current_annotation = annotation
+            current_text = ''
+        current_text += ''.join(lines)
 
     flush()
 

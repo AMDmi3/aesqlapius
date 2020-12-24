@@ -1,5 +1,9 @@
 # Changelog
 
+## unreleased
+
+* Support multiline annotations
+
 ## 0.0.7
 
 * Add aiopg support
