@@ -63,12 +63,13 @@ class FunctionDefinition:
 
 def _parse_return_value_inner(node: ast.AST) -> ReturnValueInnerFormat:
     if isinstance(node, ast.Subscript):
-        assert isinstance(node.value, ast.Name)
+        if not isinstance(node.value, ast.Name):
+            raise SyntaxError(f"unexpected row format '{ast.unparse(node)}'")
         row_format_name = node.value.id
     elif isinstance(node, ast.Name):
         row_format_name = node.id
     else:
-        raise TypeError(f"Unexpected row format '{ast.unparse(node)}'")
+        raise SyntaxError(f"unexpected row format '{ast.unparse(node)}'")
 
     if row_format_name == 'Tuple':
         return ReturnValueInnerFormat.TUPLE
@@ -77,28 +78,29 @@ def _parse_return_value_inner(node: ast.AST) -> ReturnValueInnerFormat:
     elif row_format_name == 'Value':
         return ReturnValueInnerFormat.VALUE
     else:
-        raise TypeError(f"Unexpected row format '{row_format_name}'")
+        raise TypeError(f"unexpected row format '{row_format_name}'")
 
 
 def _parse_return_value_outer(node: ast.Subscript) -> ReturnValueDefinition:
-    assert isinstance(node.value, ast.Name)
+    if not isinstance(node.value, ast.Name):
+        raise SyntaxError(f"unexpected rows format '{ast.unparse(node)}'")
 
     if node.value.id == 'Dict':
-        # requre two args, e.g. Dict[a, b]
-        assert isinstance(node.slice, ast.Tuple)
-        assert len(node.slice.elts) == 2
+        if not isinstance(node.slice, ast.Tuple) or len(node.slice.elts) != 2:
+            raise SyntaxError(f"unexpected Dict row format specification '{ast.unparse(node)}'")
 
         # handle unary minus for the first arg, e.g. Dict[-a, b]
         if isinstance(node.slice.elts[0], ast.UnaryOp):
-            assert isinstance(node.slice.elts[0].op, ast.USub)
+            if not isinstance(node.slice.elts[0].op, ast.USub):
+                raise SyntaxError(f"unexpected column reference format '{ast.unparse(node.slice.elts[0])}'")
             remove_key_column = True
             dict_by = node.slice.elts[0].operand
         else:
             remove_key_column = False
             dict_by = node.slice.elts[0]
 
-        assert isinstance(dict_by, ast.Constant)
-        assert isinstance(dict_by.value, int) or isinstance(dict_by.value, str)
+        if not isinstance(dict_by, ast.Constant) or not (isinstance(dict_by.value, int) or isinstance(dict_by.value, str)):
+            raise SyntaxError(f"expected string or numeric column reference, not '{ast.unparse(dict_by)}'")
 
         return ReturnValueDefinition(
             outer_format=ReturnValueOuterFormat.DICT,
@@ -114,7 +116,7 @@ def _parse_return_value_outer(node: ast.Subscript) -> ReturnValueDefinition:
     elif node.value.id == 'Single':
         outer_format = ReturnValueOuterFormat.SINGLE
     else:
-        raise TypeError(f"Unexpected rows format '{node.value.id}'")
+        raise TypeError(f"unexpected rows format '{node.value.id}'")
 
     return ReturnValueDefinition(
         outer_format=outer_format,
@@ -125,8 +127,8 @@ def _parse_return_value_outer(node: ast.Subscript) -> ReturnValueDefinition:
 def parse_function_definition(source: str) -> FunctionDefinition:
     tree = ast.parse(source)
 
-    assert(len(tree.body) == 1)
-    assert(isinstance(tree.body[0], ast.FunctionDef))
+    if len(tree.body) != 1 or not isinstance(tree.body[0], ast.FunctionDef):
+        raise SyntaxError('single function definition expected')
 
     func = tree.body[0]
 
@@ -144,7 +146,8 @@ def parse_function_definition(source: str) -> FunctionDefinition:
     first_default_idx = len(func.args.args) - len(func.args.defaults)
 
     for argn, default in enumerate(func.args.defaults, first_default_idx):
-        assert(isinstance(default, ast.Constant))
+        if not isinstance(default, ast.Constant):
+            raise SyntaxError(f"constant default expected, not '{ast.unparse(default)}'")
 
         func_def.args[argn].has_default = True
         func_def.args[argn].default = default.value
@@ -155,13 +158,14 @@ def parse_function_definition(source: str) -> FunctionDefinition:
     if isinstance(returns, ast.Constant) and returns.value is None:
         func_def.returns = None
     else:
-        assert isinstance(returns, ast.Subscript)
+        if returns is None:
+            raise SyntaxError(f"return value annotation required")
+        elif not isinstance(returns, ast.Subscript):
+            raise SyntaxError(f"unexpected rows format '{ast.unparse(returns)}'")
         func_def.returns = _parse_return_value_outer(returns)
 
     # check body
-    assert(len(func.body) == 1)
-    assert(isinstance(func.body[0], ast.Expr))
-    assert(isinstance(func.body[0].value, ast.Constant))
-    assert(func.body[0].value.value is Ellipsis)
+    if len(func.body) != 1 or not isinstance(func.body[0], ast.Expr) or not isinstance(func.body[0].value, ast.Constant) or func.body[0].value.value is not Ellipsis:
+        raise SyntaxError('single ellipsis expected as function body')
 
     return func_def

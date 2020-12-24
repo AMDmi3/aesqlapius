@@ -179,16 +179,6 @@ def test_returns_inner_value():
     )
 
 
-def test_returns_invalid_outer():
-    with pytest.raises(TypeError):
-        parse_function_definition('def Foo() -> BadType[List]: ...')
-
-
-def test_returns_invalid_inner():
-    with pytest.raises(TypeError):
-        parse_function_definition('def Foo() -> List[BadType]: ...')
-
-
 def test_accepts_complex_arg_annotations():
     assert parse_function_definition(
         'def Foo(arg: Tuple[str, int]) -> None: ...'
@@ -219,3 +209,79 @@ def test_accepts_complex_return_annotations():
             inner_format=ReturnValueInnerFormat.VALUE
         )
     )
+
+
+def test_syntax_requires_single_statement():
+    with pytest.raises(SyntaxError):
+        parse_function_definition('def A() -> None: ...\ndef B() -> None: ...')
+
+
+def test_syntax_requires_function_definition():
+    with pytest.raises(SyntaxError):
+        parse_function_definition('foo = 1')
+
+
+def test_syntax_requires_constant_default_arg():
+    with pytest.raises(SyntaxError):
+        parse_function_definition('def A(foo=1+1) -> None: ...')
+
+
+def test_syntax_requires_body_ellipsis():
+    with pytest.raises(SyntaxError):
+        parse_function_definition('def A() -> None: 1')
+
+    with pytest.raises(SyntaxError):
+        parse_function_definition('def A() -> None:\n    ...\n    ...')
+
+
+def test_syntax_requires_returns():
+    with pytest.raises(SyntaxError):
+        parse_function_definition('def A(): ...')
+
+
+def test_syntax_requires_returns_rows_subscript():
+    with pytest.raises(SyntaxError):
+        parse_function_definition('def A() -> Single: ...')
+
+
+def test_syntax_requires_returns_rows_subscript_name():
+    with pytest.raises(SyntaxError):
+        parse_function_definition('def A() -> 1[1]: ...')
+
+
+def test_syntax_requires_returns_rows_corrent():
+    with pytest.raises(TypeError):
+        parse_function_definition('def Foo() -> BadType[List]: ...')
+
+
+def test_syntax_requires_returns_row_subscript():
+    with pytest.raises(SyntaxError):
+        parse_function_definition('def A() -> Single[1]: ...')
+
+
+def test_syntax_requires_returns_row_subscript_name():
+    with pytest.raises(SyntaxError):
+        parse_function_definition('def A() -> Single[1[1]]: ...')
+
+
+def test_syntax_requires_returns_row_corrent():
+    with pytest.raises(TypeError):
+        parse_function_definition('def A() -> List[BadType]: ...')
+
+
+def test_syntax_requires_returns_dict_nargs():
+    with pytest.raises(SyntaxError):
+        parse_function_definition('def A() -> Dict[1, 2, Value]: ...')
+
+    with pytest.raises(SyntaxError):
+        parse_function_definition('def A() -> Dict[Value]: ...')
+
+
+def test_syntax_requires_returns_dict_colref():
+    with pytest.raises(SyntaxError):
+        parse_function_definition('def A() -> Dict[0.0, Value]: ...')
+
+
+def test_syntax_requires_returns_dict_colref_modifier():
+    with pytest.raises(SyntaxError):
+        parse_function_definition('def A() -> Dict[+1, Value]: ...')
