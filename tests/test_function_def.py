@@ -14,9 +14,7 @@ def test_simple():
     assert parse_function_definition(
         'def Foo() -> None: ...'
     ) == FunctionDefinition(
-        name='Foo',
-        args=[],
-        returns=None
+        name='Foo'
     )
 
 
@@ -29,8 +27,7 @@ def test_args_unannotated():
             ArgumentDefinition(name='a'),
             ArgumentDefinition(name='b'),
             ArgumentDefinition(name='c'),
-        ],
-        returns=None
+        ]
     )
 
 
@@ -43,8 +40,7 @@ def test_args():
             ArgumentDefinition(name='a'),
             ArgumentDefinition(name='b'),
             ArgumentDefinition(name='c'),
-        ],
-        returns=None
+        ]
     )
 
 
@@ -57,8 +53,7 @@ def test_default_args():
             ArgumentDefinition(name='a'),
             ArgumentDefinition(name='b', has_default=True, default=2),
             ArgumentDefinition(name='c', has_default=True, default=3),
-        ],
-        returns=None
+        ]
     )
 
 
@@ -67,7 +62,6 @@ def test_returns_outer_iterator():
         'def Foo() -> Iterator[Tuple]: ...'
     ) == FunctionDefinition(
         name='Foo',
-        args=[],
         returns=ReturnValueDefinition(
             outer_format=ReturnValueOuterFormat.ITERATOR,
             inner_format=ReturnValueInnerFormat.TUPLE
@@ -80,7 +74,6 @@ def test_returns_outer_list():
         'def Foo() -> List[Tuple]: ...'
     ) == FunctionDefinition(
         name='Foo',
-        args=[],
         returns=ReturnValueDefinition(
             outer_format=ReturnValueOuterFormat.LIST,
             inner_format=ReturnValueInnerFormat.TUPLE
@@ -93,7 +86,6 @@ def test_returns_outer_single():
         'def Foo() -> Single[Tuple]: ...'
     ) == FunctionDefinition(
         name='Foo',
-        args=[],
         returns=ReturnValueDefinition(
             outer_format=ReturnValueOuterFormat.SINGLE,
             inner_format=ReturnValueInnerFormat.TUPLE
@@ -106,7 +98,6 @@ def test_returns_outer_dict():
         'def Foo() -> Dict[0, Tuple]: ...'
     ) == FunctionDefinition(
         name='Foo',
-        args=[],
         returns=ReturnValueDefinition(
             outer_format=ReturnValueOuterFormat.DICT,
             inner_format=ReturnValueInnerFormat.TUPLE,
@@ -118,7 +109,6 @@ def test_returns_outer_dict():
         'def Foo() -> Dict["colname", Tuple]: ...'
     ) == FunctionDefinition(
         name='Foo',
-        args=[],
         returns=ReturnValueDefinition(
             outer_format=ReturnValueOuterFormat.DICT,
             inner_format=ReturnValueInnerFormat.TUPLE,
@@ -132,7 +122,6 @@ def test_returns_outer_dict_remove_key():
         'def Foo() -> Dict[-0, Tuple]: ...'
     ) == FunctionDefinition(
         name='Foo',
-        args=[],
         returns=ReturnValueDefinition(
             outer_format=ReturnValueOuterFormat.DICT,
             inner_format=ReturnValueInnerFormat.TUPLE,
@@ -145,7 +134,6 @@ def test_returns_outer_dict_remove_key():
         'def Foo() -> Dict[-"colname", Tuple]: ...'
     ) == FunctionDefinition(
         name='Foo',
-        args=[],
         returns=ReturnValueDefinition(
             outer_format=ReturnValueOuterFormat.DICT,
             inner_format=ReturnValueInnerFormat.TUPLE,
@@ -160,7 +148,6 @@ def test_returns_inner_tuple():
         'def Foo() -> Single[Tuple]: ...'
     ) == FunctionDefinition(
         name='Foo',
-        args=[],
         returns=ReturnValueDefinition(
             outer_format=ReturnValueOuterFormat.SINGLE,
             inner_format=ReturnValueInnerFormat.TUPLE
@@ -173,7 +160,6 @@ def test_returns_inner_dict():
         'def Foo() -> Single[Dict]: ...'
     ) == FunctionDefinition(
         name='Foo',
-        args=[],
         returns=ReturnValueDefinition(
             outer_format=ReturnValueOuterFormat.SINGLE,
             inner_format=ReturnValueInnerFormat.DICT
@@ -186,7 +172,6 @@ def test_returns_inner_value():
         'def Foo() -> Single[Value]: ...'
     ) == FunctionDefinition(
         name='Foo',
-        args=[],
         returns=ReturnValueDefinition(
             outer_format=ReturnValueOuterFormat.SINGLE,
             inner_format=ReturnValueInnerFormat.VALUE
