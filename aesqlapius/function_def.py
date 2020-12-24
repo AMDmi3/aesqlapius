@@ -62,17 +62,22 @@ class FunctionDefinition:
 
 
 def _parse_return_value_inner(node: ast.AST) -> ReturnValueInnerFormat:
-    # in future, support subscripts with detailed type specifications
-    assert isinstance(node, ast.Name)
+    if isinstance(node, ast.Subscript):
+        assert isinstance(node.value, ast.Name)
+        row_format_name = node.value.id
+    elif isinstance(node, ast.Name):
+        row_format_name = node.id
+    else:
+        raise TypeError(f"Unexpected row format '{ast.unparse(node)}'")
 
-    if node.id == 'Tuple':
+    if row_format_name == 'Tuple':
         return ReturnValueInnerFormat.TUPLE
-    elif node.id == 'Dict':
+    elif row_format_name == 'Dict':
         return ReturnValueInnerFormat.DICT
-    elif node.id == 'Value':
+    elif row_format_name == 'Value':
         return ReturnValueInnerFormat.VALUE
     else:
-        raise TypeError(f'Unexpected row format {node.id}')
+        raise TypeError(f"Unexpected row format '{row_format_name}'")
 
 
 def _parse_return_value_outer(node: ast.Subscript) -> ReturnValueDefinition:
@@ -109,7 +114,7 @@ def _parse_return_value_outer(node: ast.Subscript) -> ReturnValueDefinition:
     elif node.value.id == 'Single':
         outer_format = ReturnValueOuterFormat.SINGLE
     else:
-        raise TypeError(f'Unexpected rows format {node.value.id}')
+        raise TypeError(f"Unexpected rows format '{node.value.id}'")
 
     return ReturnValueDefinition(
         outer_format=outer_format,

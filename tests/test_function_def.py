@@ -204,7 +204,6 @@ def test_returns_invalid_inner():
         parse_function_definition('def Foo() -> List[BadType]: ...')
 
 
-@pytest.mark.xfail
 def test_accepts_complex_arg_annotations():
     assert parse_function_definition(
         'def Foo(arg: Tuple[str, int]) -> None: ...'
@@ -216,7 +215,22 @@ def test_accepts_complex_arg_annotations():
     )
 
 
-@pytest.mark.xfail
 def test_accepts_complex_return_annotations():
-    parse_function_definition('def Foo() -> Single[Value[bool]]: ...')
-    parse_function_definition('def Foo() -> Single[Value[Tuple[str, int]]]: ...')
+    assert parse_function_definition(
+        'def Foo() -> Single[Value[bool]]: ...'
+    ) == FunctionDefinition(
+        name='Foo',
+        returns=ReturnValueDefinition(
+            outer_format=ReturnValueOuterFormat.SINGLE,
+            inner_format=ReturnValueInnerFormat.VALUE
+        )
+    )
+    assert parse_function_definition(
+        'def Foo() -> Single[Value[Optional[str]]]: ...'
+    ) == FunctionDefinition(
+        name='Foo',
+        returns=ReturnValueDefinition(
+            outer_format=ReturnValueOuterFormat.SINGLE,
+            inner_format=ReturnValueInnerFormat.VALUE
+        )
+    )
