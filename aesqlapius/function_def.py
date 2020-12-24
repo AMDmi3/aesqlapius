@@ -27,7 +27,6 @@ from typing import Any, List, Optional, Union
 @dataclass
 class ArgumentDefinition:
     name: str
-    type_: Any = None
     has_default: bool = False
     default: Any = None
 
@@ -131,8 +130,7 @@ def parse_function_definition(source: str) -> FunctionDefinition:
     # parse arguments
     for arg in func.args.args:
         arg_def = ArgumentDefinition(
-            name=arg.arg,
-            type_=arg.annotation.id if arg.annotation else None  # type: ignore
+            name=arg.arg
         )
 
         func_def.args.append(arg_def)

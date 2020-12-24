@@ -40,9 +40,9 @@ def test_args():
     ) == FunctionDefinition(
         name='Foo',
         args=[
-            ArgumentDefinition(name='a', type_='int'),
-            ArgumentDefinition(name='b', type_='str'),
-            ArgumentDefinition(name='c', type_='float'),
+            ArgumentDefinition(name='a'),
+            ArgumentDefinition(name='b'),
+            ArgumentDefinition(name='c'),
         ],
         returns=None
     )
@@ -54,9 +54,9 @@ def test_default_args():
     ) == FunctionDefinition(
         name='Foo',
         args=[
-            ArgumentDefinition(name='a', type_='int'),
-            ArgumentDefinition(name='b', type_='int', has_default=True, default=2),
-            ArgumentDefinition(name='c', type_='int', has_default=True, default=3),
+            ArgumentDefinition(name='a'),
+            ArgumentDefinition(name='b', has_default=True, default=2),
+            ArgumentDefinition(name='c', has_default=True, default=3),
         ],
         returns=None
     )
@@ -206,7 +206,14 @@ def test_returns_invalid_inner():
 
 @pytest.mark.xfail
 def test_accepts_complex_arg_annotations():
-    parse_function_definition('def Foo(arg: Tuple[str, int]) -> None: ...')
+    assert parse_function_definition(
+        'def Foo(arg: Tuple[str, int]) -> None: ...'
+    ) == FunctionDefinition(
+        name='Foo',
+        args=[
+            ArgumentDefinition(name='arg'),
+        ]
+    )
 
 
 @pytest.mark.xfail
