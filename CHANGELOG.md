@@ -2,6 +2,8 @@
 
 ## unreleased
 
+## 0.0.8
+
 * Support multiline annotations
 * Allow arbitrary argument and return type annotations (which are
   currenty ignored)
