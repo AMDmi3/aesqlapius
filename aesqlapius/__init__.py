@@ -42,7 +42,7 @@ __version__ = '0.0.8'
 
 T = TypeVar('T')
 NAMESPACE_MODE = Literal['dirs', 'files', 'flat']
-DRIVER = Literal['psycop2', 'sqlite3', 'mysql', 'aiopg']
+DRIVER = Literal['psycopg2', 'sqlite3', 'mysql', 'aiopg']
 
 
 @overload
