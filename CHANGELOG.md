@@ -2,6 +2,10 @@
 
 ## unreleased
 
+## 0.0.9
+
+* Typing fix
+
 ## 0.0.8
 
 * Support multiline annotations
