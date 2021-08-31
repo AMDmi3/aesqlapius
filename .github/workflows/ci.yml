@@ -3,6 +3,11 @@ on: [ push, pull_request ]
 jobs:
   build:
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        include:
+          - { python: '3.9' }
+          - { python: '3.10.0-rc.1' }
     services:
       mysql:
         image: mariadb:latest
@@ -27,7 +32,7 @@ jobs:
       - name: Setup python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: ${{ matrix.python }}
       - name: Install python dependencies
         run: |
           pip install -r requirements-dev.txt
