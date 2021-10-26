@@ -7,7 +7,8 @@ jobs:
       matrix:
         include:
           - { python: '3.9' }
-          - { python: '3.10.0-rc.1' }
+          - { python: '3.10.0' }
+          - { python: '3.11.0-alpha.1' }
     services:
       mysql:
         image: mariadb:latest
