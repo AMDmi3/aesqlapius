@@ -3,12 +3,13 @@ on: [ push, pull_request ]
 jobs:
   build:
     runs-on: ubuntu-20.04
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
         include:
-          - { python: '3.9' }
-          - { python: '3.10.0' }
-          #- { python: '3.11.0-alpha.1' }  # asyncpg fails
+          - { python: '3.9', experimental: false }
+          - { python: '3.10.0', experimental: false }
+          - { python: '3.11.0-alpha.2', experimental: true }
     services:
       mysql:
         image: mariadb:latest
