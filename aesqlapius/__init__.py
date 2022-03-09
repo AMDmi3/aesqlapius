@@ -105,7 +105,7 @@ def generate_api(
             namespace_path = entry.namespace_path[:-1]
 
         for query in queries:
-            method_func = driver_module.generate_method(query, hook)  # type: ignore
+            method_func = driver_module.generate_method(query, hook)
 
             if db is not None:
                 method_func = functools.partial(method_func, db)
