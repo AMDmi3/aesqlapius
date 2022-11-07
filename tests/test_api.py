@@ -1,4 +1,5 @@
 import pytest
+import pytest_asyncio
 
 from aesqlapius import generate_api
 
@@ -6,7 +7,7 @@ from .fixtures import *  # noqa
 from .helpers import convert_api_to_async
 
 
-@pytest.fixture()
+@pytest_asyncio.fixture()
 async def api(queries_dir, dbenv):
     api = generate_api(queries_dir / 'api', dbenv.driver, dbenv.db, hook=dbenv.get_query_preprocessor())
     convert_api_to_async(api)

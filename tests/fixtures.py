@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 import pytest
+import pytest_asyncio
 
 __all__ = [
     'dbenv',
@@ -79,7 +80,7 @@ class DBEnv:
         return hook
 
 
-@pytest.fixture(params=[
+@pytest_asyncio.fixture(params=[
     'psycopg2',
     'sqlite3',
     'mysql',
