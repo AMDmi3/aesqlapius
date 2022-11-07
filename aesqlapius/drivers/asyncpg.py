@@ -117,7 +117,7 @@ def generate_method(query: Query, hook: QueryHook) -> Callable[..., Any]:
 
     elif returns.outer_format == ReturnValueOuterFormat.ITERATOR:
         async def method_returning_iterator(db: Any, *args: Any, **kwargs: Any) -> AsyncIterator[Any]:
-            assert(returns is not None)  # mypy bug
+            assert returns is not None  # mypy bug
             prepared_args = prepare_args_as_dict(func_def, args, kwargs)
             prepared_args_list = prepare_args_as_list(func_def, args, kwargs)
             process_row = _generate_row_processor(returns.inner_format)
@@ -130,7 +130,7 @@ def generate_method(query: Query, hook: QueryHook) -> Callable[..., Any]:
 
     elif returns.outer_format == ReturnValueOuterFormat.LIST:
         async def method_returning_list(db: Any, *args: Any, **kwargs: Any) -> List[Any]:
-            assert(returns is not None)  # mypy bug
+            assert returns is not None  # mypy bug
             prepared_args = prepare_args_as_dict(func_def, args, kwargs)
             prepared_args_list = prepare_args_as_list(func_def, args, kwargs)
             process_row = _generate_row_processor(returns.inner_format)
@@ -144,7 +144,7 @@ def generate_method(query: Query, hook: QueryHook) -> Callable[..., Any]:
 
     elif returns.outer_format == ReturnValueOuterFormat.SINGLE:
         async def method_returning_single(db: Any, *args: Any, **kwargs: Any) -> Any:
-            assert(returns is not None)  # mypy bug
+            assert returns is not None  # mypy bug
             prepared_args = prepare_args_as_dict(func_def, args, kwargs)
             prepared_args_list = prepare_args_as_list(func_def, args, kwargs)
             process_row = _generate_row_processor(returns.inner_format)
@@ -156,8 +156,8 @@ def generate_method(query: Query, hook: QueryHook) -> Callable[..., Any]:
 
     elif returns.outer_format == ReturnValueOuterFormat.DICT:
         async def method_returning_dict(db: Any, *args: Any, **kwargs: Any) -> Any:
-            assert(returns is not None)  # mypy bug
-            assert(returns.outer_dict_by is not None)
+            assert returns is not None  # mypy bug
+            assert returns.outer_dict_by is not None
             prepared_args = prepare_args_as_dict(func_def, args, kwargs)
             prepared_args_list = prepare_args_as_list(func_def, args, kwargs)
 

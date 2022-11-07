@@ -124,7 +124,7 @@ async def dbenv(request, tmp_path):
             conn = await asyncpg.connect(**DSN('POSTGRESQL_DSN', 'asyncpg').get())
             yield DBEnv('asyncpg', conn)
         else:
-            assert(False)
+            assert False
 
     except ImportError as e:
         pytest.skip(f'Cannot import {e.name}, skipping related tests', allow_module_level=True)
