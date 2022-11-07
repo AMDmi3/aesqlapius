@@ -11,7 +11,7 @@ test::
 	${PYTEST} ${PYTEST_ARGS} -v -rs
 
 flake8::
-	${FLAKE8} ${FLAKE8_ARGS} --application-import-names=aesqlapius aesqlapius tests
+	${FLAKE8} ${FLAKE8_ARGS} aesqlapius tests
 
 mypy::
 	${MYPY} ${MYPY_ARGS} aesqlapius
